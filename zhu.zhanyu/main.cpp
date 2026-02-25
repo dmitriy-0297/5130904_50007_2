@@ -1,5 +1,5 @@
 #include<iostream>
 int mian(){
     std::cout<<"Чжу Чжаньюй"<<std::endl;
-    return 0;
+    return 0;//T0
 }
