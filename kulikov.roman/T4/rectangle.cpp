@@ -45,4 +45,4 @@ void Rectangle::print() const {
     std::cout << std::fixed << std::setprecision(2);
     std::cout << "[" << getName() << ", (" << getCenter().x << ", "
               << getCenter().y << "), " << getArea() << "]";
-}
+}// Line endings fixed

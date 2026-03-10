@@ -22,4 +22,4 @@ public:
     Point getTopRight() const { return topRight; }
 };
 
-#endif
+#endif// Line endings fixed

@@ -27,4 +27,4 @@ public:
     size_t getShapeCount() const { return shapes.size(); }
 };
 
-#endif
+#endif// Line endings fixed
