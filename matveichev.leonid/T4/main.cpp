@@ -6,7 +6,7 @@
 #include "rectangle.h"
 #include "ellipse.h"
 #include "composite_shape.h"
-// fixed lf
+
 int main() {
     std::vector<std::unique_ptr<Shape>> shapes;
 
