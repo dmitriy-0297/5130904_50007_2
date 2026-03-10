@@ -39,7 +39,7 @@ void CompositeShape::scale(double coefficient) {
 
     for (auto& shape : shapes_) {
         Point shapeCenter = shape->getCenter();
-        
+
         double dx = shapeCenter.x - center.x;
         double dy = shapeCenter.y - center.y;
 
@@ -56,7 +56,7 @@ void CompositeShape::print(std::ostream& os) const {
     os << std::fixed << std::setprecision(2);
     Point center = getCenter();
     os << "[" << getName() << ", (" << center.x << ", " << center.y << "), " << getArea() << ":" << std::endl;
-    
+
     for (size_t i = 0; i < shapes_.size(); ++i) {
         os << " ";
         shapes_[i]->print(os);
@@ -65,7 +65,7 @@ void CompositeShape::print(std::ostream& os) const {
         }
         os << std::endl;
     }
-    
+
     os << "]";
 }
 
