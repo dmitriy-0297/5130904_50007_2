@@ -21,4 +21,4 @@ public:
     void print() const override;
 };
 
-#endif// Line endings fixed
+#endif

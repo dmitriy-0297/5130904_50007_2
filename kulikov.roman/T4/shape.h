@@ -15,4 +15,4 @@ public:
     virtual void print() const = 0;
 };
 
-#endif// Line endings fixed
+#endif

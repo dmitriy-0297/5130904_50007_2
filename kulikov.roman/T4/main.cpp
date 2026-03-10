@@ -15,11 +15,8 @@ int main() {
     std::vector<std::unique_ptr<Shape>> shapes;
 
     shapes.push_back(std::make_unique<Rectangle>(Point(-1, 1), Point(5, 3)));
-
     shapes.push_back(std::make_unique<Rectangle>(Point(0, 0), Point(4, 3)));
-
     shapes.push_back(std::make_unique<Trapezoid>(Point(-1, 1), 6, 3, 2));
-
     shapes.push_back(std::make_unique<Rectangle>(Point(2, 0), Point(6, 4)));
 
     auto composite = std::make_unique<CompositeShape>();
@@ -27,24 +24,27 @@ int main() {
     composite->addShape(std::make_unique<Rectangle>(Point(3, 1), Point(5, 3)));
     shapes.push_back(std::move(composite));
 
-    std::cout << "=== До масштабирования ===" << std::endl;
-    std::cout << std::endl;
-
     for (size_t i = 0; i < shapes.size(); i++) {
-        std::cout << "Фигура " << (i + 1) << ": ";
+        std::cout << "Figure " << (i + 1) << ": ";
         printShape(shapes[i].get());
-        std::cout << std::endl;
     }
 
-    std::cout << "=== После масштабирования (x2) ===" << std::endl;
-    std::cout << std::endl;
+    bool scalingRequired = true;
+    
+    if (!scalingRequired) {
+        std::cerr << "Error: scaling is required for full description" << std::endl;
+        return 2;
+    }
 
+
+    for (auto& shape : shapes) {
+        shape->scale(2.0);
+    }
+    
     for (size_t i = 0; i < shapes.size(); i++) {
-        std::cout << "Фигура " << (i + 1) << ": ";
-        shapes[i]->scale(2.0);
+        std::cout << "Figure " << (i + 1) << ": ";
         printShape(shapes[i].get());
-        std::cout << std::endl;
     }
 
     return 0;
-}// Line endings fixed
+}
