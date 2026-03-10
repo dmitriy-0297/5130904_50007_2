@@ -27,10 +27,10 @@ void Rectangle::scale(double coefficient) {
     Point center = getCenter();
     double width = topRight.x - Left.x;
     double height = topRight.y - Left.y;
-    
+
     width *= coefficient;
     height *= coefficient;
-    
+
     Left.x = center.x - width / 2.0;
     Left.y = center.y - height / 2.0;
     topRight.x = center.x + width / 2.0;
@@ -43,6 +43,6 @@ const char* Rectangle::getName() const {
 
 void Rectangle::print() const {
     std::cout << std::fixed << std::setprecision(2);
-    std::cout << "[" << getName() << ", (" << getCenter().x << ", " 
+    std::cout << "[" << getName() << ", (" << getCenter().x << ", "
               << getCenter().y << "), " << getArea() << "]";
 }

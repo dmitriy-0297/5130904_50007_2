@@ -9,10 +9,10 @@ private:
     double Base;
     double topBase;
     double height;
-    
+
 public:
     Trapezoid(Point bl, double Base, double topBase, double height);
-    
+
     double getArea() const override;
     Point getCenter() const override;
     void move(double dx, double dy) override;

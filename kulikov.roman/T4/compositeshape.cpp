@@ -13,16 +13,16 @@ Point CompositeShape::getBoundingBoxMin() const {
     if (shapes.empty()) {
         return Point(0.0, 0.0);
     }
-    
+
     double minX = shapes[0]->getCenter().x;
     double minY = shapes[0]->getCenter().y;
-    
+
     for (const auto& shape : shapes) {
         Point center = shape->getCenter();
         if (center.x < minX) minX = center.x;
         if (center.y < minY) minY = center.y;
     }
-    
+
     return Point(minX, minY);
 }
 
@@ -30,16 +30,16 @@ Point CompositeShape::getBoundingBoxMax() const {
     if (shapes.empty()) {
         return Point(0.0, 0.0);
     }
-    
+
     double maxX = shapes[0]->getCenter().x;
     double maxY = shapes[0]->getCenter().y;
-    
+
     for (const auto& shape : shapes) {
         Point center = shape->getCenter();
         if (center.x > maxX) maxX = center.x;
         if (center.y > maxY) maxY = center.y;
     }
-    
+
     return Point(maxX, maxY);
 }
 
@@ -65,13 +65,13 @@ void CompositeShape::move(double dx, double dy) {
 
 void CompositeShape::scale(double coefficient) {
     Point center = getCenter();
-    
+
     for (auto& shape : shapes) {
         Point shapeCenter = shape->getCenter();
-        
+
         double dx = (shapeCenter.x - center.x) * coefficient;
         double dy = (shapeCenter.y - center.y) * coefficient;
-        
+
         shape->move(center.x - shapeCenter.x, center.y - shapeCenter.y);
         shape->scale(coefficient);
         shape->move(dx, dy);
@@ -84,9 +84,9 @@ const char* CompositeShape::getName() const {
 
 void CompositeShape::print() const {
     std::cout << std::fixed << std::setprecision(2);
-    std::cout << "[" << getName() << ", (" << getCenter().x << ", " 
+    std::cout << "[" << getName() << ", (" << getCenter().x << ", "
               << getCenter().y << "), " << getArea() << ":" << std::endl;
-    
+
     for (size_t i = 0; i < shapes.size(); i++) {
         std::cout << "  ";
         shapes[i]->print();
@@ -95,6 +95,6 @@ void CompositeShape::print() const {
         }
         std::cout << std::endl;
     }
-    
+
     std::cout << "]";
 }

@@ -2,7 +2,7 @@
 #include <iostream>
 #include <iomanip>
 
-Trapezoid::Trapezoid(Point bl, double bb, double tb, double h) 
+Trapezoid::Trapezoid(Point bl, double bb, double tb, double h)
     : Left(bl), Base(bb), topBase(tb), height(h) {}
 
 double Trapezoid::getArea() const {
@@ -22,11 +22,11 @@ void Trapezoid::move(double dx, double dy) {
 
 void Trapezoid::scale(double coefficient) {
     Point center = getCenter();
-    
+
     Base *= coefficient;
     topBase *= coefficient;
     height *= coefficient;
-    
+
     Left.x = center.x - (Base + topBase) / 4.0;
     Left.y = center.y - height / 2.0;
 }
@@ -37,6 +37,6 @@ const char* Trapezoid::getName() const {
 
 void Trapezoid::print() const {
     std::cout << std::fixed << std::setprecision(2);
-    std::cout << "[" << getName() << ", (" << getCenter().x << ", " 
+    std::cout << "[" << getName() << ", (" << getCenter().x << ", "
               << getCenter().y << "), " << getArea() << "]";
 }
