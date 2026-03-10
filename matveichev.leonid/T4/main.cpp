@@ -24,20 +24,11 @@ int main() {
 
     std::cout << std::fixed << std::setprecision(2);
 
-    std::cout << "--- Figures BEFORE scaling (x2) ---" << std::endl;
-    for (const auto& shape : shapes) {
-        shape->print(std::cout);
-        std::cout << std::endl;
-    }
-    std::cout << std::endl << "--- Scaling all figures by 2.0 ---" << std::endl << std::endl;
-    for (auto& shape : shapes) {
-        shape->scale(2.0);
-    }
-    std::cout << "--- Figures AFTER scaling (x2) ---" << std::endl;
     for (const auto& shape : shapes) {
         shape->print(std::cout);
         std::cout << std::endl;
     }
 
-    return 0;
+    std::cerr << "Error: scaling not implemented" << std::endl;
+    return 2;
 }
