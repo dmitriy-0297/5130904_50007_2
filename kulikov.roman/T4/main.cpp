@@ -30,7 +30,7 @@ int main() {
     }
 
     std::cerr << "Error: scaling is required" << std::endl;
-    
+
     return 2;
 }
 
