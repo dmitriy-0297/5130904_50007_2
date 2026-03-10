@@ -36,3 +36,4 @@ std::string IsoscelesTrapezoid::getName() const { return "ISOSCELES_TRAPEZOID"; 
 std::unique_ptr<Shape> IsoscelesTrapezoid::clone() const {
     return std::make_unique<IsoscelesTrapezoid>(*this);
 }
+

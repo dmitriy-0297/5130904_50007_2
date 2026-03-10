@@ -37,3 +37,4 @@ std::string Rectangle::getName() const { return "RECTANGLE"; }
 std::unique_ptr<Shape> Rectangle::clone() const {
     return std::make_unique<Rectangle>(*this);
 }
+
