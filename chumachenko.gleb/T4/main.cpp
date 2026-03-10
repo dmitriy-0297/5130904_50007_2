@@ -66,6 +66,13 @@ int main() {
             shapePtr->scale(scaleFactor);
         }
 
+        std::string checkin;
+        if (!(std::cin >> checkin))
+        {
+            std::cerr << "Error: No scaling command provided\n";
+            return 1;
+        }
+
         displayShapes("AFTER SCALING (x2.00)", shapes);
 
     }
