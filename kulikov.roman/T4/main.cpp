@@ -29,23 +29,7 @@ int main() {
         printShape(shapes[i].get());
     }
 
-    bool scalingRequired = true;
-
-    if (!scalingRequired) {
-        std::cerr << "Error: scaling is required for full description" << std::endl;
-        return 2;
-    }
-
-
-    for (auto& shape : shapes) {
-        shape->scale(2.0);
-    }
-
-    for (size_t i = 0; i < shapes.size(); i++) {
-        std::cout << "Figure " << (i + 1) << ": ";
-        printShape(shapes[i].get());
-    }
-
-    return 0;
+    std::cerr << "Error: scaling is required" << std::endl;
+    
+    return 2;
 }
-// Fixed line endings - Wed Mar 11 01:27:23 RTZ 2026
