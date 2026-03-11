@@ -2,6 +2,6 @@
 
 int main()
 {
-    std::cout<<matveichev.leonidn;
+    std::cout<<"matveichev.leonid\n";
     return 0;
 }
