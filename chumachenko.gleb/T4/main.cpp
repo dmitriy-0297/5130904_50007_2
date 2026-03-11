@@ -18,7 +18,7 @@ void printShapeDetails(const Shape& shape) {
         const auto& composite = static_cast<const CompositeShape&>(shape);
         const auto& children = composite.getShapes();
 
-        std::cout << ": ";
+        std::cout << ": \n";
         for (size_t i = 0; i < children.size(); ++i) {
             const auto& child = children[i];
             std::cout << child->getName() << ", ("
@@ -26,11 +26,14 @@ void printShapeDetails(const Shape& shape) {
                 << child->getArea();
 
             if (i < children.size() - 1) {
-                std::cout << ", ";
+                std::cout << ", \n";
             }
         }
     }
-    std::cout << "]";
+
+
+    std::cout << (shape.getName() == "COMPOSITE" ? "\n]" : "]");
+
 }
 
 void displayShapes(const std::string& header, const std::vector<std::unique_ptr<Shape>>& container) {
@@ -69,19 +72,15 @@ int main() {
         std::string checkin;
         if (!(std::cin >> checkin))
         {
-            std::cerr << "Error: No scaling command provided\n";
+            std::cerr << "ERROR: No input\n";
             return 1;
         }
 
         displayShapes("AFTER SCALING (x2.00)", shapes);
 
     }
-    catch (const std::invalid_argument& e) {
-        std::cerr << "INVALID ARGUMENT ERROR: " << e.what() << std::endl;
-        return 1;
-    }
     catch (const std::exception& e) {
-        std::cerr << "CRITICAL ERROR: " << e.what() << std::endl;
+        std::cerr << "ERROR: " << e.what() << std::endl;
         return 1;
     }
 
