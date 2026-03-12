@@ -1,19 +1,30 @@
-#include"CompositeShape.h"
-#include"Square.h"
-#include"Rectangle.h"
+#include "CompositeShape.h"
+#include <algorithm>
+#include <new>
+
 void CompositeShape::addShape(std::unique_ptr<Shape> shape) {
-	shapes_.push_back(std::move(shape));
+    if (!shape) {
+        return;
+    }
+    try {
+        shapes_.push_back(std::move(shape));
+    }
+    catch (const std::bad_alloc& e) {
+        throw std::bad_alloc();
+    }
 }
-double CompositeShape::getArea()const {
-	double total = 0.0;
-	for (const auto& shape : shapes_) {
-		total += shape->getArea();
-	}
-	return total;
+
+double CompositeShape::getArea() const {
+    double total = 0.0;
+    for (const auto& shape : shapes_) {
+        total += shape->getArea();
+    }
+    return total;
 }
+
 Point CompositeShape::getCenter() const {
     if (shapes_.empty()) {
-        return { 0, 0 };  
+        return { 0, 0 };
     }
     double min_x = shapes_[0]->getMinX();
     double max_x = shapes_[0]->getMaxX();
@@ -27,11 +38,13 @@ Point CompositeShape::getCenter() const {
     }
     return { (min_x + max_x) / 2, (min_y + max_y) / 2 };
 }
+
 void CompositeShape::move(double dx, double dy) {
     for (auto& shape : shapes_) {
         shape->move(dx, dy);
     }
 }
+
 void CompositeShape::scale(double factor) {
     Point compositeCenter = getCenter();
     for (auto& shape : shapes_) {
@@ -49,9 +62,11 @@ void CompositeShape::scale(double factor) {
         shape->scale(factor);
     }
 }
-std::string CompositeShape::getName()const {
+
+std::string CompositeShape::getName() const {
     return "COMPOSITE";
 }
+
 double CompositeShape::getMinX() const {
     if (shapes_.empty()) return 0;
     double min_x = shapes_[0]->getMinX();

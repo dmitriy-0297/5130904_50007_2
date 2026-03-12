@@ -1,12 +1,15 @@
 #ifndef COMPOSITESHAPE_H
 #define COMPOSITESHAPE_H
-#include"Shape.h"
-#include"Point.h"
-#include<vector>
-#include<memory>
-class CompositeShape :public Shape {
+
+#include "Shape.h"
+#include "Point.h"
+#include <vector>
+#include <memory>
+
+class CompositeShape : public Shape {
 private:
-	std::vector<std::unique_ptr<Shape>> shapes_;
+    std::vector<std::unique_ptr<Shape>> shapes_;
+
 public:
     CompositeShape() = default;
     void addShape(std::unique_ptr<Shape> shape);
@@ -24,4 +27,5 @@ public:
         return shapes_[index].get();
     }
 };
+
 #endif
