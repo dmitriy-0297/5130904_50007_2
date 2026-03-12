@@ -1,7 +1,10 @@
-#include "Rectangle.h"
+#include"Rectangle.h"
+#include <stdexcept>
 
-Rectangle::Rectangle(Point leftBottom, Point rightTop)
-    : leftBottom_(leftBottom), rightTop_(rightTop) {
+Rectangle::Rectangle(Point leftBottom, Point rightTop) :leftBottom_(leftBottom), rightTop_(rightTop) {
+    if (rightTop.x <= leftBottom.x || rightTop.y <= leftBottom.y) {
+        throw std::invalid_argument("Invalid rectangle: rightTop must be above and to the right of leftBottom");
+    }
 }
 
 double Rectangle::getArea() const {
@@ -10,7 +13,7 @@ double Rectangle::getArea() const {
     return width * height;
 }
 
-Point Rectangle::getCenter() const {
+Point Rectangle::getCenter()const {
     Point Center;
     Center.x = (rightTop_.x + leftBottom_.x) / 2;
     Center.y = (rightTop_.y + leftBottom_.y) / 2;
@@ -25,6 +28,9 @@ void Rectangle::move(double dx, double dy) {
 }
 
 void Rectangle::scale(double factor) {
+    if (factor <= 0) {
+        throw std::invalid_argument("Scale factor must be positive");
+    }
     Point center = getCenter();
     double width = rightTop_.x - leftBottom_.x;
     double height = rightTop_.y - leftBottom_.y;

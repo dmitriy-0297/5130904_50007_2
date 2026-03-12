@@ -1,10 +1,11 @@
-#include "CompositeShape.h"
+#include"CompositeShape.h"
 #include <algorithm>
+#include <stdexcept>
 #include <new>
 
 void CompositeShape::addShape(std::unique_ptr<Shape> shape) {
     if (!shape) {
-        return;
+        throw std::invalid_argument("Cannot add null shape to composite");
     }
     try {
         shapes_.push_back(std::move(shape));
@@ -14,7 +15,7 @@ void CompositeShape::addShape(std::unique_ptr<Shape> shape) {
     }
 }
 
-double CompositeShape::getArea() const {
+double CompositeShape::getArea()const {
     double total = 0.0;
     for (const auto& shape : shapes_) {
         total += shape->getArea();
@@ -46,6 +47,9 @@ void CompositeShape::move(double dx, double dy) {
 }
 
 void CompositeShape::scale(double factor) {
+    if (factor <= 0) {
+        throw std::invalid_argument("Scale factor must be positive");
+    }
     Point compositeCenter = getCenter();
     for (auto& shape : shapes_) {
         Point shapeCenter = shape->getCenter();
@@ -63,7 +67,7 @@ void CompositeShape::scale(double factor) {
     }
 }
 
-std::string CompositeShape::getName() const {
+std::string CompositeShape::getName()const {
     return "COMPOSITE";
 }
 

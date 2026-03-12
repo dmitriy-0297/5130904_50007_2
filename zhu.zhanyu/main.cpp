@@ -2,7 +2,6 @@
 #include <iomanip>
 #include <memory>
 #include <vector>
-#include <new>
 #include "Rectangle.h"
 #include "Square.h"
 #include "CompositeShape.h"
@@ -75,6 +74,10 @@ int main() {
     }
     catch (const std::bad_alloc& e) {
         std::cerr << "Memory allocation failed: " << e.what() << std::endl;
+        return 1;
+    }
+    catch (const std::invalid_argument& e) {
+        std::cerr << "Invalid argument: " << e.what() << std::endl;
         return 1;
     }
     catch (const std::exception& e) {
