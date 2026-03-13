@@ -106,3 +106,4 @@ double CompositeShape::getMaxY() const {
     }
     return max_y;
 }
+
