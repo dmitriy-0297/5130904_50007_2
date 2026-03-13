@@ -12,12 +12,18 @@ Rectangle::Rectangle(Point bottomLeft, Point topRight) {
 
     width_ = w;
     height_ = h;
-    center_ = { (bottomLeft.x + topRight.x) / 2.0, (bottomLeft.y + topRight.y) / 2.0 };
+
+    center_.x = (bottomLeft.x + topRight.x) / 2.0;
+    center_.y = (bottomLeft.y + topRight.y) / 2.0;
 }
 
-double Rectangle::getArea() const { return width_ * height_; }
+double Rectangle::getArea() const {
+    return width_ * height_;
+}
 
-Point Rectangle::getCenter() const { return center_; }
+Point Rectangle::getCenter() const {
+    return center_;
+}
 
 void Rectangle::move(double dx, double dy) {
     center_.x += dx;
@@ -32,7 +38,9 @@ void Rectangle::scale(double factor) {
     height_ *= factor;
 }
 
-std::string Rectangle::getName() const { return "RECTANGLE"; }
+std::string Rectangle::getName() const {
+    return "RECTANGLE";
+}
 
 std::unique_ptr<Shape> Rectangle::clone() const {
     return std::make_unique<Rectangle>(*this);

@@ -31,9 +31,7 @@ void printShapeDetails(const Shape& shape) {
         }
     }
 
-
     std::cout << (shape.getName() == "COMPOSITE" ? "\n]" : "]");
-
 }
 
 void displayShapes(const std::string& header, const std::vector<std::unique_ptr<Shape>>& container) {
@@ -64,14 +62,13 @@ int main() {
 
         displayShapes("BEFORE SCALING", shapes);
 
-        const double scaleFactor = 2.0;
+        const double SCALE_FACTOR = 2.0;
         for (auto& shapePtr : shapes) {
-            shapePtr->scale(scaleFactor);
+            shapePtr->scale(SCALE_FACTOR);
         }
 
         std::string checkin;
-        if (!(std::cin >> checkin))
-        {
+        if (!(std::cin >> checkin)) {
             std::cerr << "ERROR: No input\n";
             return 1;
         }

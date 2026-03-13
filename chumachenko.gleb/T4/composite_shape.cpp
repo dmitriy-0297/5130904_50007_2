@@ -28,47 +28,70 @@ void CompositeShape::add(std::unique_ptr<Shape> shape) {
 }
 
 double CompositeShape::getArea() const {
-    double total = 0;
-    for (const auto& s : shapes_) total += s->getArea();
+    double total = 0.0;
+    for (const auto& s : shapes_) {
+        total += s->getArea();
+    }
     return total;
 }
 
 Point CompositeShape::getCenter() const {
-    if (shapes_.empty()) return { 0.0, 0.0 };
+    if (shapes_.empty()) {
+        Point emptyPoint;
+        emptyPoint.x = 0.0;
+        emptyPoint.y = 0.0;
+        return emptyPoint;
+    }
 
     double minX = std::numeric_limits<double>::max();
     double maxX = std::numeric_limits<double>::lowest();
-    double minY = minX, maxY = maxX;
+    double minY = minX;
+    double maxY = maxX;
 
     for (const auto& s : shapes_) {
         Point c = s->getCenter();
-        minX = std::min(minX, c.x); maxX = std::max(maxX, c.x);
-        minY = std::min(minY, c.y); maxY = std::max(maxY, c.y);
+        minX = std::min(minX, c.x);
+        maxX = std::max(maxX, c.x);
+        minY = std::min(minY, c.y);
+        maxY = std::max(maxY, c.y);
     }
-    return { (minX + maxX) / 2.0, (minY + maxY) / 2.0 };
+
+    Point centerPoint;
+    centerPoint.x = (minX + maxX) / 2.0;
+    centerPoint.y = (minY + maxY) / 2.0;
+    return centerPoint;
 }
 
 void CompositeShape::move(double dx, double dy) {
-    for (auto& s : shapes_) s->move(dx, dy);
+    for (auto& s : shapes_) {
+        s->move(dx, dy);
+    }
 }
 
 void CompositeShape::scale(double factor) {
-    if (factor <= 0.0) throw std::invalid_argument("Scale factor must be positive");
-    if (shapes_.empty()) return;
+    if (factor <= 0.0) {
+        throw std::invalid_argument("Scale factor must be positive");
+    }
+    if (shapes_.empty()) {
+        return;
+    }
 
     Point baseCenter = getCenter();
     for (auto& s : shapes_) {
         Point currentCenter = s->getCenter();
-        double dx = (currentCenter.x - baseCenter.x) * (factor - 1);
-        double dy = (currentCenter.y - baseCenter.y) * (factor - 1);
+        double dx = (currentCenter.x - baseCenter.x) * (factor - 1.0);
+        double dy = (currentCenter.y - baseCenter.y) * (factor - 1.0);
         s->move(dx, dy);
         s->scale(factor);
     }
 }
 
-std::string CompositeShape::getName() const { return "COMPOSITE"; }
+std::string CompositeShape::getName() const {
+    return "COMPOSITE";
+}
 
 std::unique_ptr<Shape> CompositeShape::clone() const {
     return std::make_unique<CompositeShape>(*this);
 }
+
 
