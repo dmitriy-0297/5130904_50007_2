@@ -1,17 +1,14 @@
 #include "isosceles_trapezoid.h"
 #include <stdexcept>
 
-IsoscelesTrapezoid::IsoscelesTrapezoid(Point bottomLeft, double bBottom, double bTop, double height) :
+IsoscelesTrapezoid::IsoscelesTrapezoid(const Point& bottomLeft, double bBottom, double bTop, double height) :
+    center_{ bottomLeft.x + bBottom / 2.0, bottomLeft.y + height / 2.0 },
     bBottom_(bBottom),
     bTop_(bTop),
     height_(height) {
-
-    if (bBottom <= 0.0 || bTop <= 0.0 || height <= 0.0) {
+    if (bBottom_ <= 0.0 || bTop_ <= 0.0 || height_ <= 0.0) {
         throw std::invalid_argument("Trapezoid parameters must be positive");
     }
-
-    center_.x = bottomLeft.x + bBottom / 2.0;
-    center_.y = bottomLeft.y + height / 2.0;
 }
 
 double IsoscelesTrapezoid::getArea() const {

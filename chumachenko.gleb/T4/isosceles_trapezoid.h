@@ -5,7 +5,7 @@
 
 class IsoscelesTrapezoid : public Shape {
 public:
-    IsoscelesTrapezoid(Point bottomLeft, double bBottom, double bTop, double height);
+    IsoscelesTrapezoid(const Point& bottomLeft, double bBottom, double bTop, double height);
 
     double getArea() const override;
     Point getCenter() const override;
