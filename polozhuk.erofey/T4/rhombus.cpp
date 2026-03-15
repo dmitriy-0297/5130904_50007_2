@@ -49,3 +49,5 @@ void Rhombus::print() const {
     std::cout<<getArea()<<"\n";
 }
 
+
+

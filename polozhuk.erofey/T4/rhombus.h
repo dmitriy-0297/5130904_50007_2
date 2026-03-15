@@ -29,3 +29,5 @@ class Rhombus : public Shape{
 };
 #endif //INC_5130904_50007_2_RHOMBUS_H
 
+
+

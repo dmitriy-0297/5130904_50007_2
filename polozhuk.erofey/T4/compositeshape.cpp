@@ -11,7 +11,7 @@ void CompositeShape::addShape(std::unique_ptr<Shape> shape) {
 }
 double CompositeShape::getArea() const {
     double bigSum = 0.0;
-    for (int i = 0; i < shapes_.size(); ++i) {
+    for (size_t i = 0; i < shapes_.size(); ++i) {
         bigSum += shapes_[i]->getArea();
     }
     return bigSum;
@@ -75,4 +75,6 @@ void CompositeShape::print() const {
     }
     std::cout << "]\n";
 }
+
+
 

@@ -12,3 +12,5 @@ std::ostream& operator<<(std::ostream& os, const Point& p) {
 }
 #endif //INC_5130904_50007_2_POINT_H
 
+
+
