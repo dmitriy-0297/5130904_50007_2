@@ -48,3 +48,4 @@ void Rhombus::print() const {
     std::cout <<"(" <<getCenter().x_ << ", " <<getCenter().y_ << "), ";
     std::cout<<getArea()<<"\n";
 }
+

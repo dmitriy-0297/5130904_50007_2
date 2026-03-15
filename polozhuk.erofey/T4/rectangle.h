@@ -23,3 +23,4 @@ private:
     Point rh_;
 };
 #endif //INC_5130904_50007_2_RECTANGLE_H
+

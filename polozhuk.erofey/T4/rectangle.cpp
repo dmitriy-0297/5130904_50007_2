@@ -48,3 +48,4 @@ void Rectangle::print() const {
     std::cout <<ld_.y_ << "), ";
     std::cout<<getArea()<<"\n";
 }
+
