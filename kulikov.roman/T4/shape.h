@@ -3,17 +3,19 @@
 
 #include "point.h"
 
-class Shape {
+class Shape
+{
 public:
-    virtual ~Shape() {}
+    virtual ~Shape()
+    {
+    }
 
     virtual double getArea() const = 0;
     virtual Point getCenter() const = 0;
     virtual void move(double dx, double dy) = 0;
-    virtual void scale(double coefficient) = 0;
+    virtual void scale(double k) = 0;
     virtual const char* getName() const = 0;
     virtual void print() const = 0;
 };
 
 #endif
-// Fixed line endings - Wed Mar 11 01:27:39 RTZ 2026

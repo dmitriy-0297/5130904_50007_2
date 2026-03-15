@@ -2,47 +2,69 @@
 #include <iostream>
 #include <iomanip>
 
-Rectangle::Rectangle(Point bl, Point tr) : Left(bl), topRight(tr) {}
+Rectangle::Rectangle(Point bl, Point tr)
+    : lowLeft_(bl)
+    , topRight_(tr)
+{
+}
 
-double Rectangle::getArea() const {
-    double width = topRight.x - Left.x;
-    double height = topRight.y - Left.y;
+double Rectangle::getArea() const
+{
+    const double width = topRight_.x - lowLeft_.x;
+    const double height = topRight_.y - lowLeft_.y;
     return width * height;
 }
 
-Point Rectangle::getCenter() const {
-    double centerX = (Left.x + topRight.x) / 2.0;
-    double centerY = (Left.y + topRight.y) / 2.0;
+Point Rectangle::getCenter() const
+{
+    const double centerX = (lowLeft_.x + topRight_.x) / 2.0;
+    const double centerY = (lowLeft_.y + topRight_.y) / 2.0;
     return Point(centerX, centerY);
 }
 
-void Rectangle::move(double dx, double dy) {
-    Left.x += dx;
-    Left.y += dy;
-    topRight.x += dx;
-    topRight.y += dy;
+void Rectangle::move(double dx, double dy)
+{
+    lowLeft_.x += dx;
+    lowLeft_.y += dy;
+    topRight_.x += dx;
+    topRight_.y += dy;
 }
 
-void Rectangle::scale(double coefficient) {
-    Point center = getCenter();
-    double width = topRight.x - Left.x;
-    double height = topRight.y - Left.y;
+void Rectangle::scale(double k)
+{
+    const Point center = getCenter();
+    const double width = topRight_.x - lowLeft_.x;
+    const double height = topRight_.y - lowLeft_.y;
 
-    width *= coefficient;
-    height *= coefficient;
+    const double newWidth = width * k;
+    const double newHeight = height * k;
 
-    Left.x = center.x - width / 2.0;
-    Left.y = center.y - height / 2.0;
-    topRight.x = center.x + width / 2.0;
-    topRight.y = center.y + height / 2.0;
+    lowLeft_.x = center.x - newWidth / 2.0;
+    lowLeft_.y = center.y - newHeight / 2.0;
+    topRight_.x = center.x + newWidth / 2.0;
+    topRight_.y = center.y + newHeight / 2.0;
 }
 
-const char* Rectangle::getName() const {
+const char* Rectangle::getName() const
+{
     return "RECTANGLE";
 }
 
-void Rectangle::print() const {
+void Rectangle::print() const
+{
     std::cout << std::fixed << std::setprecision(2);
-    std::cout << "[" << getName() << ", (" << getCenter().x << ", "
-              << getCenter().y << "), " << getArea() << "]";
+    std::cout << "[" << getName() << ", ("
+              << getCenter().x << ", "
+              << getCenter().y << "), "
+              << getArea() << "]";
+}
+
+Point Rectangle::getBottomLeft() const
+{
+    return lowLeft_;
+}
+
+Point Rectangle::getTopRight() const
+{
+    return topRight_;
 }
