@@ -32,7 +32,5 @@ int main()
         printShape(shapes[i].get());
     }
 
-    std::cerr << "Error: scaling is required for full description" << std::endl;
-
-    return 2;
+    return 0;
 }
