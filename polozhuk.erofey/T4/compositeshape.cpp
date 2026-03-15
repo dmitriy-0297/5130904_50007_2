@@ -17,8 +17,7 @@ double CompositeShape::getArea() const {
     return bigSum;
 }
 void CompositeShape::move(double x, double y) {
-    int count = shapes_.size();
-    for (size_t i = 0; i < count; ++i) {
+    for (size_t i = 0; i <shapes_.size(); ++i) {
         shapes_[i]->move(x, y);
     }
 }
