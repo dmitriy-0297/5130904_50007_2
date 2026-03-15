@@ -26,26 +26,13 @@ int main()
     composite->addShape(std::make_unique<Rectangle>(Point(3, 1), Point(5, 3)));
     shapes.push_back(std::move(composite));
 
-    std::cout << "=== До масштабирования ===" << std::endl;
-    std::cout << std::endl;
-
     for (size_t i = 0; i < shapes.size(); i++)
     {
-        std::cout << "Фигура " << (i + 1) << ": ";
+        std::cout << "Figure " << (i + 1) << ": ";
         printShape(shapes[i].get());
-        std::cout << std::endl;
     }
 
-    std::cout << "=== После масштабирования (x2) ===" << std::endl;
-    std::cout << std::endl;
-
-    for (size_t i = 0; i < shapes.size(); i++)
-    {
-        std::cout << "Фигура " << (i + 1) << ": ";
-        shapes[i]->scale(2.0);
-        printShape(shapes[i].get());
-        std::cout << std::endl;
-    }
-
-    return 0;
+    std::cerr << "Error: scaling is required for full description" << std::endl;
+    
+    return 2;
 }
