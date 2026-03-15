@@ -6,10 +6,8 @@ struct Point {
     double x_;
     double y_;
 };
-std::ostream& operator<<(std::ostream& os, const Point& p) {
-    os << "(" << p.x_ << ", " << p.y_ << ")";
-    return os;
-}
+
+
 #endif //INC_5130904_50007_2_POINT_H
 
 
