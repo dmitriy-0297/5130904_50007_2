@@ -12,6 +12,7 @@ Point Square::getCenter()const {
     Point Center;
     Center.x = leftBottom_.x + size_ / 2;
     Center.y = leftBottom_.y ;
+    return Center;
 }
 void Square::move(double dx, double dy) {
     leftBottom_.x += dx;
