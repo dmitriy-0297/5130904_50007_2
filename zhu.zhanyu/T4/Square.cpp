@@ -11,21 +11,7 @@ double Square::getArea()const {
 Point Square::getCenter()const {
     Point Center;
     Center.x = leftBottom_.x + size_ / 2;
-    Center.y = leftBottom_.y + size_ / 2;
-    return Cente#include"Square.h"
-#include <stdexcept>
-Square::Square(Point leftBottom, double size) :leftBottom_(leftBottom), size_(size) {
-    if (size <= 0) {
-        throw std::invalid_argument("Square side length must be positive");
-    }
-}
-double Square::getArea()const {
-    return size_ * size_;
-}
-Point Square::getCenter()const {
-    Point Center;
-    Center.x = leftBottom_.x + size_ / 2;
-    Center.y = leftBottom_.y r;
+    Center.y = leftBottom_.y ;
 }
 void Square::move(double dx, double dy) {
     leftBottom_.x += dx;
