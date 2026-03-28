@@ -88,5 +88,5 @@ void CompositeShape::print(std::ostream& os, bool) const {
         shapes_[i]->print(os, false);
         os << "," << std::endl;
     }
-    os << "]";
+    os << "]" << std::endl;
 }

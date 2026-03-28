@@ -11,7 +11,7 @@
 void printShapes(const std::vector<std::unique_ptr<Shape>>& shapes) {
     std::cout << std::fixed << std::setprecision(2);
     for (const auto& shape : shapes) {
-        shape->print(std::cout);
+        shape->print(std::cout, true);
         std::cout << std::endl;
     }
     std::cout << std::endl;
@@ -35,12 +35,6 @@ int main() {
 
     for (auto& shape : shapes) {
         shape->scale(2.0);
-    }
-
-    std::string proverka;
-    if (!(std::cin >> proverka)) {
-        std::cerr << "error\n";
-        return 1;
     }
 
     std::cout << "After scaling (x2):" << std::endl;
