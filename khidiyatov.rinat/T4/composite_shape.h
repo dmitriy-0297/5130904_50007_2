@@ -24,5 +24,5 @@ private:
     std::vector<std::unique_ptr<Shape>> shapes_;
 };
 
-#endif 
+#endif
 

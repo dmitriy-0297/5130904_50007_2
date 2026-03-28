@@ -20,5 +20,5 @@ private:
     Point topRight_;
 };
 
-#endif 
+#endif
 

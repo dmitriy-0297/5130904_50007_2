@@ -19,5 +19,5 @@ public:
     virtual std::pair<Point, Point> getBounds() const = 0;
 };
 
-#endif 
+#endif
 

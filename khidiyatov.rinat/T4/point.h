@@ -8,5 +8,5 @@ struct Point {
     Point(double x, double y);
 };
 
-#endif 
+#endif
 
