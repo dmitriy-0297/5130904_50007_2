@@ -15,7 +15,7 @@ public:
     void move(double dx, double dy) override;
     void scale(double factor) override;
     std::string getName() const override;
-    void print(std::ostream& os, bool wrap) const override;
+    void print(std::ostream& os, bool) const override;
     std::pair<Point, Point> getBounds() const override;
 
     void addShape(std::unique_ptr<Shape> shape);

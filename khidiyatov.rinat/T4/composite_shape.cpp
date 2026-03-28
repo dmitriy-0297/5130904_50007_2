@@ -76,7 +76,7 @@ std::string CompositeShape::getName() const {
     return "COMPOSITE";
 }
 
-void CompositeShape::print(std::ostream& os, bool wrap) const {
+void CompositeShape::print(std::ostream& os, bool) const {
     Point center = getCenter();
     double area = getArea();
     os << std::fixed << std::setprecision(2);
