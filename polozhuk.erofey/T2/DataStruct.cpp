@@ -28,3 +28,26 @@ std::istream& operator>>(std::istream& in, Double&& dest){
     }
     return in;
 }
+
+std::istream& operator>>(std::istream& in, SLongLongIO&& dest) {
+    std::istream::sentry sentry(in);
+    if (!sentry) {
+        return in;
+    }
+    in >> dest.ref;
+    if (!in) {
+        return in;
+    }
+    char c1 = in.peek();
+    if (c1 == 'L' || c1 == 'l'){
+        in.get(c1);
+        char c2 = in.peek();
+        if (c2 == 'L' || c2 == 'l'){
+            in.get(c2);
+        }
+        else{
+            in.setstate(std::ios::failbit);
+        }
+    }
+    return in;
+}
