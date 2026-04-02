@@ -58,23 +58,27 @@ std::istream& operator>>(std::istream& in, StringIO&& dest) {
     }
     return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
 }
-std::istream& operator>>(std::istream& in, DataStruct& dest) {
+std::istream& operator>>(std::istream& in, DataStruct& dest){
     std::istream::sentry sentry(in);
     if (!sentry){
         return in;
     }
-    char c1 = '0';
-    char c2 = '0';
-    in >> c1;
-    in >> c2;
-    if (!in || c1 != '(' || c2 != ':'){
-        in.setstate(std::ios::failbit);
-        return in;
-    }
+    std::streampos pos = in.tellg();
     DataStruct tmp{};
     bool key1 = false;
     bool key2 = false;
     bool key3 = false;
+    char c1 = '0';
+    char c2 = '0';
+    in >> c1 >> c2;
+    if (!in || c1 != '(' || c2 != ':'){
+        in.clear();
+        in.seekg(pos);
+        std::string skippedLine;
+        std::getline(in, skippedLine);
+        in.setstate(std::ios::failbit);
+        return in;
+    }
     while (in){
         in >> std::ws;
         if (in.peek() == ':'){
@@ -84,19 +88,18 @@ std::istream& operator>>(std::istream& in, DataStruct& dest) {
                 break;
             }
         }
-        std::string name{};
+        std::string name;
         in >> name;
         if (!in) {
             break;
         }
-        if (name == "key1" && !key1) {
+        if (name == "key1" && !key1){
             in >> Double{ tmp.key1 };
             if (in) {
                 key1 = true;
             }
         }
-        else if (name == "key2" && !key2)
-        {
+        else if (name == "key2" && !key2){
             in >> SLongLongIO{ tmp.key2 };
             if (in) {
                 key2 = true;
@@ -113,12 +116,15 @@ std::istream& operator>>(std::istream& in, DataStruct& dest) {
             break;
         }
     }
-    if (in && key1 && key2 && key3) {
+    if (in && key1 && key2 && key3){
         dest = std::move(tmp);
+        return in;
     }
-    else {
-        in.setstate(std::ios::failbit);
-    }
+    in.clear();
+    in.seekg(pos);
+    std::string skippedLine;
+    std::getline(in, skippedLine);
+    in.setstate(std::ios::failbit);
     return in;
 }
 std::ostream& operator<<(std::ostream& out, const DataStruct& src){
