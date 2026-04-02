@@ -25,8 +25,9 @@ public:
     ~iofmtguard();
 private:
     std::basic_ios<char>& s_;
-    std::streamsize width_, precision_;
+    std::streamsize width_;
     char fill_;
+    std::streamsize precision_;
     std::ios::fmtflags fmt_;
 };
 
