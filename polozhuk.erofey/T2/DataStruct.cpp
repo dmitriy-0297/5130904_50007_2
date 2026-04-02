@@ -121,3 +121,15 @@ std::istream& operator>>(std::istream& in, DataStruct& dest) {
     }
     return in;
 }
+std::ostream& operator<<(std::ostream& out, const DataStruct& src){
+    std::ostream::sentry sentry(out);
+    if (!sentry) {
+        return out;
+    }
+    iofmtguard g(out);
+    out << "(:key1 ";
+    out << std::fixed << std::setprecision(1) << src.key1 << "d:";
+    out << "key2 " << src.key2 << "LL:";
+    out << "key3 \"" << src.key3 << "\":)";
+    return out;
+}
