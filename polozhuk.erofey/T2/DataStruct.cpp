@@ -74,8 +74,8 @@ std::istream& operator>>(std::istream& in, DataStruct& dest){
     if (!in || c1 != '(' || c2 != ':'){
         in.clear();
         in.seekg(pos);
-        std::string skippedLine;
-        std::getline(in, skippedLine);
+        std::string skip;
+        std::getline(in, skip);
         in.setstate(std::ios::failbit);
         return in;
     }
@@ -87,10 +87,11 @@ std::istream& operator>>(std::istream& in, DataStruct& dest){
                 in.get();
                 break;
             }
+            continue;
         }
         std::string name;
         in >> name;
-        if (!in) {
+        if (!in){
             break;
         }
         if (name == "key1" && !key1){
@@ -99,9 +100,9 @@ std::istream& operator>>(std::istream& in, DataStruct& dest){
                 key1 = true;
             }
         }
-        else if (name == "key2" && !key2){
+        else if (name == "key2" && !key2) {
             in >> SLongLongIO{ tmp.key2 };
-            if (in) {
+            if (in){
                 key2 = true;
             }
         }
@@ -122,8 +123,8 @@ std::istream& operator>>(std::istream& in, DataStruct& dest){
     }
     in.clear();
     in.seekg(pos);
-    std::string skippedLine;
-    std::getline(in, skippedLine);
+    std::string skip;
+    std::getline(in, skip);
     in.setstate(std::ios::failbit);
     return in;
 }
