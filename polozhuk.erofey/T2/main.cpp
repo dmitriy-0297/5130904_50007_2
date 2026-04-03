@@ -12,19 +12,24 @@ bool cmp(const DataStruct& a, const DataStruct& b){
     }
     return a.key3.size() < b.key3.size();
 }
-int main() {
-    std::vector<DataStruct> data;
-    std::copy(std::istream_iterator<DataStruct>(std::cin),
-        std::istream_iterator<DataStruct>(),
-        std::back_inserter(data));
-    if (data.empty()){
-        std::cout << "Atleast one supported record type\n";
-        return 0;
-    }
-    std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
-    std::sort(data.begin(), data.end(), cmp);
+int main()
+{
+    std::vector< DataStruct > data;
+
     std::copy(
-        data.begin(), data.end(),
-        std::ostream_iterator<DataStruct>(std::cout, "\n"));
+        std::istream_iterator< DataStruct >(std::cin),
+        std::istream_iterator< DataStruct >(),
+        std::back_inserter(data)
+    );
+
+    std::sort(std::begin(data), std::end(data), cmp);
+
+    std::copy(
+        std::begin(data),
+        std::end(data),
+        std::ostream_iterator< DataStruct >(std::cout, "\n")
+    );
+
     return 0;
 }
+
