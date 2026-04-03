@@ -30,7 +30,6 @@ private:
     std::streamsize precision_;
     std::ios::fmtflags fmt_;
 };
-
 std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
 std::istream& operator>>(std::istream& in, Double&& dest);
 std::istream& operator>>(std::istream& in, SLongLongIO&& dest);

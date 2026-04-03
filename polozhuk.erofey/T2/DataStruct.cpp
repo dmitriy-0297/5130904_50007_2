@@ -35,23 +35,16 @@ std::istream& operator>>(std::istream& in, Double&& dest){
 
 std::istream& operator>>(std::istream& in, SLongLongIO&& dest){
     std::istream::sentry sentry(in);
-    if (!sentry) {
-        return in;
-    }
+    if (!sentry) return in;
     in >> dest.ref;
-    if (!in) {
-        return in;
-    }
-    char c1 = in.peek();
-    if (c1 == 'L' || c1 == 'l'){
-        in.get(c1);
-        char c2 = in.peek();
-        if (c2 == 'L' || c2 == 'l'){
-            in.get(c2);
-        }
-        else{
-            in.setstate(std::ios::failbit);
-        }
+    if (!in) return in;
+    char s1='0';
+    char s2= '0';
+    in >> s1 >> s2;
+    bool first_ok = (s1 == 'l' || s1 == 'L');
+    bool second_ok = (s2 == 'l' || s2 == 'L');
+    if (!first_ok || !second_ok) {
+        in.setstate(std::ios::failbit);
     }
     return in;
 }

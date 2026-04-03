@@ -14,11 +14,14 @@ bool cmp(const DataStruct& a, const DataStruct& b){
 }
 int main() {
     std::vector<DataStruct> data;
-    std::copy(
-        std::istream_iterator<DataStruct>(std::cin),
+    std::copy(std::istream_iterator<DataStruct>(std::cin),
         std::istream_iterator<DataStruct>(),
-        std::back_inserter(data)
-    );
+        std::back_inserter(data));
+    if (data.empty()) {
+        std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
+        return 0;
+    }
+    std::cout << "Atleast one supported record type\n";
     std::sort(data.begin(), data.end(), cmp);
     std::copy(
         data.begin(), data.end(),
