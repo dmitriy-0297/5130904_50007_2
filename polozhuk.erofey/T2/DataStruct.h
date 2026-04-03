@@ -38,4 +38,3 @@ std::istream& operator>>(std::istream& in, StringIO&& dest);
 std::istream& operator>>(std::istream& in, DataStruct& dest);
 std::ostream& operator<<(std::ostream& out, const DataStruct& src);
 #endif //INC_5130904_50007_2_DATASTRUCT_H
-
