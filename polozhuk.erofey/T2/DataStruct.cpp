@@ -1,8 +1,6 @@
 #include "DataStruct.h"
 #include <iomanip>
 #include <sstream>
-#include <cctype>
-
 std::istream& operator>>(std::istream& in, DelimiterIO&& dest){
     std::istream::sentry sentry(in);
     if (!sentry) {
@@ -16,12 +14,12 @@ std::istream& operator>>(std::istream& in, DelimiterIO&& dest){
     return in;
 }
 
-std::istream& operator>>(std::istream& in, Double&& dest){
+std::istream& operator>>(std::istream& in, Double&& key){
     std::istream::sentry sentry(in);
     if (!sentry) {
         return in;
     }
-    in >> dest.ref;
+    in >> key.ref;
     if (!in) {
         return in;
     }
@@ -33,18 +31,25 @@ std::istream& operator>>(std::istream& in, Double&& dest){
     return in;
 }
 
-std::istream& operator>>(std::istream& in, SLongLongIO&& dest){
+std::istream& operator>>(std::istream& in, SLongLongIO&& key){
     std::istream::sentry sentry(in);
-    if (!sentry) return in;
-    in >> dest.ref;
-    if (!in) return in;
-    char s1='0';
-    char s2= '0';
-    in >> s1 >> s2;
-    bool first_ok = (s1 == 'l' || s1 == 'L');
-    bool second_ok = (s2 == 'l' || s2 == 'L');
-    if (!first_ok || !second_ok) {
-        in.setstate(std::ios::failbit);
+    if (!sentry){
+        return in;
+    }
+    in >> key.ref;
+    if (in)
+    {
+        char next = in.peek();
+        if (next == 'L' || next == 'l'){
+            in.get();
+            char next2 = in.peek();
+            if (next2 == 'L' || next2 == 'l'){
+                in.get();
+            }
+            else{
+                in.setstate(std::ios::failbit);
+            }
+        }
     }
     return in;
 }
@@ -56,59 +61,35 @@ std::istream& operator>>(std::istream& in, StringIO&& dest){
     }
     return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
 }
-std::istream& operator>>(std::istream& in, DataStruct& dest){
-    std::string line;
-    while (std::getline(in, line)){
-        std::istringstream iss(line);
-        char a ='0';
-        char b='0';
-        if (!(iss >> a >> b) || a != '(' || b != ':') {
-            continue;
+std::istream& operator>>(std::istream& in, DataStruct& data){
+    std::istream::sentry sentry(in);
+    if (!sentry){
+        return in;
+    }
+    size_t currKey = 0;
+    DataStruct tmp = { 0, 0, "" };
+    constexpr size_t MAX_KEYS = 3;
+    in >> DelimiterIO{ '(' };
+    for (size_t i = 0; i < MAX_KEYS && in; ++i){
+        in >> DelimiterIO{ ':' } >> DelimiterIO{ 'k' } >> DelimiterIO{ 'e' } >> DelimiterIO{ 'y' };
+        in >> currKey;
+        if (currKey == 1){
+            in >> Double{ tmp.key1 };
         }
-        DataStruct tmp{};
-        bool ok1 = false;
-        bool ok2 = false;
-        bool ok3 = false;
-        for (int i = 0; i < 3 && iss; ++i){
-            std::string name;
-            if (!(iss >> name)) {
-                break;
-            }
-            if (name == "key1" && !ok1) {
-                double v;
-                char s = '0';
-                if (iss >> v >> s && (s == 'd' || s == 'D')) {
-                    tmp.key1 = v; ok1 = true;
-                }
-            }
-            else if (name == "key2" && !ok2) {
-                long long v;
-                char s1 = '0';
-                char s2 = '0';
-                if (iss >> v >> s1 >> s2) {
-                    s1 = std::tolower(s1); s2 = std::tolower(s2);
-                    if (s1 == 'l' && s2 == 'l') {
-                        tmp.key2 = v; ok2 = true;
-                    }
-                }
-            }
-            else if (name == "key3" && !ok3) {
-                char q = '0';
-                std::string str;
-                if (iss >> q && q == '"' && std::getline(iss, str, '"')) {
-                    tmp.key3 = str; ok3 = true;
-                }
-            }
-            if (!iss) {
-                break;
-            }
+        else if (currKey == 2){
+            in >> SLongLongIO{ tmp.key2 };
         }
-        if (iss && ok1 && ok2 && ok3) {
-            dest = tmp;
-            return in;
+        else if (currKey == 3){
+            in >> StringIO{ tmp.key3 };
+        }
+        else{
+            in.setstate(std::ios::failbit);
         }
     }
-    in.setstate(std::ios::failbit);
+    in >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
+    if (in){
+        data = tmp;
+    }
     return in;
 }
 std::ostream& operator<<(std::ostream& out, const DataStruct& src){
