@@ -1,17 +1,21 @@
 #include "DataStruct.h"
 #include <iomanip>
+#include <sstream>
+#include <cctype>
+
 std::istream& operator>>(std::istream& in, DelimiterIO&& dest){
     std::istream::sentry sentry(in);
     if (!sentry) {
         return in;
     }
-    char c ='0';
+    char c = '0';
     in >> c;
     if (c != dest.exp) {
         in.setstate(std::ios::failbit);
     }
     return in;
 }
+
 std::istream& operator>>(std::istream& in, Double&& dest){
     std::istream::sentry sentry(in);
     if (!sentry) {
@@ -23,13 +27,13 @@ std::istream& operator>>(std::istream& in, Double&& dest){
     }
     char c = '0';
     in >> c;
-    if (c != 'd' && c!= 'D') {
+    if (c != 'd' && c != 'D') {
         in.setstate(std::ios::failbit);
     }
     return in;
 }
 
-std::istream& operator>>(std::istream& in, SLongLongIO&& dest) {
+std::istream& operator>>(std::istream& in, SLongLongIO&& dest){
     std::istream::sentry sentry(in);
     if (!sentry) {
         return in;
@@ -51,7 +55,8 @@ std::istream& operator>>(std::istream& in, SLongLongIO&& dest) {
     }
     return in;
 }
-std::istream& operator>>(std::istream& in, StringIO&& dest) {
+
+std::istream& operator>>(std::istream& in, StringIO&& dest){
     std::istream::sentry sentry(in);
     if (!sentry){
         return in;
@@ -59,72 +64,57 @@ std::istream& operator>>(std::istream& in, StringIO&& dest) {
     return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
 }
 std::istream& operator>>(std::istream& in, DataStruct& dest){
-    std::istream::sentry sentry(in);
-    if (!sentry){
-        return in;
-    }
-    std::streampos pos = in.tellg();
-    DataStruct tmp{};
-    bool key1 = false;
-    bool key2 = false;
-    bool key3 = false;
-    char c1 = '0';
-    char c2 = '0';
-    in >> c1 >> c2;
-    if (!in || c1 != '(' || c2 != ':'){
-        in.clear();
-        in.seekg(pos);
-        std::string skip;
-        std::getline(in, skip);
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-    while (in){
-        in >> std::ws;
-        if (in.peek() == ':'){
-            in.get();
-            if (in.peek() == ')'){
-                in.get();
-                break;
-            }
+    std::string line;
+    while (std::getline(in, line)){
+        std::istringstream iss(line);
+        char a ='0';
+        char b='0';
+        if (!(iss >> a >> b) || a != '(' || b != ':') {
             continue;
         }
-        std::string name;
-        in >> name;
-        if (!in){
-            break;
-        }
-        if (name == "key1" && !key1){
-            in >> Double{ tmp.key1 };
-            if (in) {
-                key1 = true;
+        DataStruct tmp{};
+        bool ok1 = false;
+        bool ok2 = false;
+        bool ok3 = false;
+        for (int i = 0; i < 3 && iss; ++i){
+            std::string name;
+            if (!(iss >> name)) {
+                break;
+            }
+            if (name == "key1" && !ok1) {
+                double v;
+                char s = '0';
+                if (iss >> v >> s && (s == 'd' || s == 'D')) {
+                    tmp.key1 = v; ok1 = true;
+                }
+            }
+            else if (name == "key2" && !ok2) {
+                long long v;
+                char s1 = '0';
+                char s2 = '0';
+                if (iss >> v >> s1 >> s2) {
+                    s1 = std::tolower(s1); s2 = std::tolower(s2);
+                    if (s1 == 'l' && s2 == 'l') {
+                        tmp.key2 = v; ok2 = true;
+                    }
+                }
+            }
+            else if (name == "key3" && !ok3) {
+                char q = '0';
+                std::string str;
+                if (iss >> q && q == '"' && std::getline(iss, str, '"')) {
+                    tmp.key3 = str; ok3 = true;
+                }
+            }
+            if (!iss) {
+                break;
             }
         }
-        else if (name == "key2" && !key2) {
-            in >> SLongLongIO{ tmp.key2 };
-            if (in){
-                key2 = true;
-            }
-        }
-        else if (name == "key3" && !key3){
-            in >> StringIO{ tmp.key3 };
-            if (in) {
-                key3 = true;
-            }
-        }
-        else{
-            in.setstate(std::ios::failbit);
-            break;
+        if (iss && ok1 && ok2 && ok3) {
+            dest = tmp;
+            return in;
         }
     }
-    if (in && key1 && key2 && key3){
-        dest = std::move(tmp);
-        return in;
-    }
-    in.clear();
-    in.seekg(pos);
-    std::string skip;
-    std::getline(in, skip);
     in.setstate(std::ios::failbit);
     return in;
 }
