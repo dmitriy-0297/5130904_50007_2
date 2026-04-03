@@ -1,6 +1,7 @@
 #include "DataStruct.h"
 #include <iomanip>
 #include <sstream>
+
 std::istream& operator>>(std::istream& in, DelimiterIO&& dest){
     std::istream::sentry sentry(in);
     if (!sentry) {
@@ -50,6 +51,9 @@ std::istream& operator>>(std::istream& in, SLongLongIO&& key){
                 in.setstate(std::ios::failbit);
             }
         }
+        else {
+            in.setstate(std::ios::failbit);
+        }
     }
     return in;
 }
@@ -61,6 +65,7 @@ std::istream& operator>>(std::istream& in, StringIO&& dest){
     }
     return std::getline(in >> DelimiterIO{ '"' }, dest.ref, '"');
 }
+
 std::istream& operator>>(std::istream& in, DataStruct& data){
     std::istream::sentry sentry(in);
     if (!sentry){
@@ -92,6 +97,7 @@ std::istream& operator>>(std::istream& in, DataStruct& data){
     }
     return in;
 }
+
 std::ostream& operator<<(std::ostream& out, const DataStruct& src){
     std::ostream::sentry sentry(out);
     if (!sentry) {
@@ -107,10 +113,10 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& src){
 
 iofmtguard::iofmtguard(std::basic_ios<char>& s): s_(s), width_(s.width()), fill_(s.fill()),
 precision_(s.precision()), fmt_(s.flags()){}
+
 iofmtguard::~iofmtguard(){
     s_.width(width_);
     s_.fill(fill_);
     s_.precision(precision_);
     s_.flags(fmt_);
 }
-

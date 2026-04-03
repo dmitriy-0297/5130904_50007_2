@@ -3,39 +3,35 @@
 #include <iostream>
 #include <iterator>
 #include <vector>
+#include <limits>
 
 bool cmp(const DataStruct& a, const DataStruct& b){
-    if (a.key1 != b.key1){
+    if (a.key1 != b.key1) {
         return a.key1 < b.key1;
     }
-    if (a.key2 != b.key2){
+    if (a.key2 != b.key2) {
         return a.key2 < b.key2;
     }
     return a.key3.size() < b.key3.size();
 }
-int main(){
-    std::vector<DataStruct> data;
-    std::copy(
-        std::istream_iterator<DataStruct>(std::cin),
-        std::istream_iterator<DataStruct>(),
-        std::back_inserter(data)
-    );
-    std::cin.clear();
-    if (data.empty())
-    {
-        std::cout << "Looks like there is no supported record. Cannot determine input. Test skipped\n";
-        std::cout.flush();
-        return 0;
-    }
-    std::cout << "Atleast one supported record type\n";
-    std::sort(data.begin(), data.end(), cmp);
-    std::copy(
-        data.begin(),
-        data.end(),
-        std::ostream_iterator<DataStruct>(std::cout, "\n")
-    );
-    std::cout.flush();
 
+int main(){
+    std::vector< DataStruct > data;
+    DataStruct tmp;
+    while (!std::cin.eof()) {
+        if (std::cin >> tmp) {
+            data.push_back(tmp);
+        } else if (!std::cin.eof()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+    }
+    std::sort(std::begin(data), std::end(data), cmp);
+    std::copy(
+        std::begin(data),
+        std::end(data),
+        std::ostream_iterator< DataStruct >(std::cout, "\n")
+    );
     return 0;
 }
 
