@@ -21,13 +21,13 @@ std::istream& operator>>(std::istream& in, Double&& key){
         return in;
     }
     in >> key.ref;
-    if (!in) {
-        return in;
-    }
-    char c = '0';
-    in >> c;
-    if (c != 'd' && c != 'D') {
-        in.setstate(std::ios::failbit);
+    if (in) {
+        char c = in.peek();
+        if (c == 'd' || c == 'D') {
+            in.get();
+        } else {
+            in.setstate(std::ios::failbit);
+        }
     }
     return in;
 }
@@ -38,8 +38,7 @@ std::istream& operator>>(std::istream& in, SLongLongIO&& key){
         return in;
     }
     in >> key.ref;
-    if (in)
-    {
+    if (in) {
         char next = in.peek();
         if (next == 'L' || next == 'l'){
             in.get();
@@ -73,27 +72,35 @@ std::istream& operator>>(std::istream& in, DataStruct& data){
     }
     size_t currKey = 0;
     DataStruct tmp = { 0, 0, "" };
-    constexpr size_t MAX_KEYS = 3;
+    bool hasKey1 = false;
+    bool hasKey2 = false;
+    bool hasKey3 = false;
+    const size_t MAX_KEYS = 3;
     in >> DelimiterIO{ '(' };
     for (size_t i = 0; i < MAX_KEYS && in; ++i){
         in >> DelimiterIO{ ':' } >> DelimiterIO{ 'k' } >> DelimiterIO{ 'e' } >> DelimiterIO{ 'y' };
         in >> currKey;
-        if (currKey == 1){
+        if (currKey == 1 && !hasKey1){
             in >> Double{ tmp.key1 };
+            hasKey1 = true;
         }
-        else if (currKey == 2){
+        else if (currKey == 2 && !hasKey2){
             in >> SLongLongIO{ tmp.key2 };
+            hasKey2 = true;
         }
-        else if (currKey == 3){
+        else if (currKey == 3 && !hasKey3){
             in >> StringIO{ tmp.key3 };
+            hasKey3 = true;
         }
         else{
             in.setstate(std::ios::failbit);
         }
     }
     in >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
-    if (in){
+    if (in && hasKey1 && hasKey2 && hasKey3){
         data = tmp;
+    } else {
+        in.setstate(std::ios::failbit);
     }
     return in;
 }
@@ -106,7 +113,7 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& src){
     iofmtguard g(out);
     out << "(:key1 ";
     out << std::fixed << std::setprecision(1) << src.key1 << "d:";
-    out << "key2 " << src.key2 << "LL:";
+    out << "key2 " << src.key2 << "ll:";
     out << "key3 \"" << src.key3 << "\":)";
     return out;
 }
