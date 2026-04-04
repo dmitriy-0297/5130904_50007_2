@@ -5,20 +5,17 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
-
 struct DataStruct {
     double key1;
     unsigned long long key2;
     std::string key3;
 };
-
 static std::string trim(const std::string str) {
     size_t first = str.find_first_not_of(" \t\n\r");
     if (first == std::string::npos) return "";
     size_t last = str.find_last_not_of(" \t\n\r");
     return str.substr(first, last - first + 1);
 }
-
 static bool parseBinary(const std::string str, unsigned long long& out) {
     if (str.length() < 3) return false;
     if (str[0] != '0' || (str[1] != 'b' && str[1] != 'B')) return false;
@@ -30,7 +27,6 @@ static bool parseBinary(const std::string str, unsigned long long& out) {
     }
     return true;
 }
-
 static bool parseDoubleSci(const std::string& str, double& out) {
     try {
         size_t pos;
@@ -40,7 +36,6 @@ static bool parseDoubleSci(const std::string& str, double& out) {
         return false;
     }
 }
-
 std::istream& operator>>(std::istream& in, DataStruct& data) {
     std::string line;
     if (!std::getline(in, line)) {
@@ -110,7 +105,6 @@ std::istream& operator>>(std::istream& in, DataStruct& data) {
     data.key3 = content.substr(start, end - start);
     return in;
 }
-
 std::string formatDoubleSci(double value) {
     if (value == 0) {
         return "0.0e+0";
@@ -145,7 +139,6 @@ std::string formatDoubleSci(double value) {
     }
     return result;
 }
-
 static std::string formatBinary(unsigned long long value) {
     if (value == 0) return "0b0";
     std::string result;
@@ -156,14 +149,12 @@ static std::string formatBinary(unsigned long long value) {
     std::reverse(result.begin(), result.end());
     return "0b" + result;
 }
-
 std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
     out << "(:key1 " << formatDoubleSci(data.key1)
         << ":key2 " << formatBinary(data.key2)
         << ":key3 \"" << data.key3 << "\":)";
     return out;
 }
-
 bool compareDataStruct(const DataStruct& a, const DataStruct& b) {
     if (a.key1 != b.key1) {
         return a.key1 < b.key1;
@@ -173,7 +164,6 @@ bool compareDataStruct(const DataStruct& a, const DataStruct& b) {
     }
     return a.key3.length() < b.key3.length();
 }
-
 int main() {
     std::vector<DataStruct> data;
     std::copy(std::istream_iterator<DataStruct>(std::cin),
