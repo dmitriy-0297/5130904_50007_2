@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <iterator>
 #include <cctype>
-#include <map>
 
 struct DataStruct
 {
@@ -94,6 +93,57 @@ static std::string formatBinary(unsigned long long value)
     return "0b" + result;
 }
 
+static bool readQuotedString(std::istream& in, std::string& out)
+{
+    char c;
+    if (!(in >> std::ws) || in.get(c), c != '"') return false;
+    out.clear();
+    while (in.get(c) && c != '"') out += c;
+    return c == '"';
+}
+
+static bool readFieldValue(std::istream& in, const std::string& key, DataStruct& temp, bool& hasKey1, bool& hasKey2, bool& hasKey3)
+{
+    if (key == "key1")
+    {
+        std::string val;
+        char c;
+        while (in.get(c) && c != ':' && c != ')') val += c;
+        if (c == ':') in.unget();
+        if (parseDoubleSci(trim(val), temp.key1))
+        {
+            hasKey1 = true;
+            return true;
+        }
+        return false;
+    }
+    else if (key == "key2")
+    {
+        std::string val;
+        char c;
+        while (in.get(c) && c != ':' && c != ')') val += c;
+        if (c == ':') in.unget();
+        if (parseBinary(trim(val), temp.key2))
+        {
+            hasKey2 = true;
+            return true;
+        }
+        return false;
+    }
+    else if (key == "key3")
+    {
+        std::string val;
+        if (readQuotedString(in, val))
+        {
+            temp.key3 = val;
+            hasKey3 = true;
+            return true;
+        }
+        return false;
+    }
+    return false;
+}
+
 std::istream& operator>>(std::istream& in, DataStruct& data)
 {
     std::string line;
@@ -103,75 +153,34 @@ std::istream& operator>>(std::istream& in, DataStruct& data)
         if (line.length() < 4 || line.substr(0, 2) != "(:" || line.substr(line.length() - 2) != ":)")
             continue;
 
-        std::string content = line.substr(2, line.length() - 4);
-        std::map<std::string, std::string> kv_map;
-
-        size_t pos = 0;
-        while (pos < content.length())
-        {
-            size_t key_start = content.find_first_not_of(" \t\n\r", pos);
-            if (key_start == std::string::npos) break;
-            size_t space_pos = content.find(' ', key_start);
-            if (space_pos == std::string::npos) break;
-            std::string key = content.substr(key_start, space_pos - key_start);
-
-            size_t val_start = content.find_first_not_of(" \t\n\r", space_pos);
-            if (val_start == std::string::npos) break;
-
-            std::string value;
-            if (content[val_start] == '"')
-            {
-                size_t val_end = val_start + 1;
-                while (val_end < content.length() && content[val_end] != '"')
-                {
-                    if (content[val_end] == '\\' && val_end + 1 < content.length())
-                        val_end++;
-                    val_end++;
-                }
-                if (val_end >= content.length()) break;
-                value = content.substr(val_start, val_end - val_start + 1);
-                pos = val_end + 1;
-                size_t colon_pos = content.find(':', pos);
-                if (colon_pos != std::string::npos)
-                    pos = colon_pos + 1;
-                else
-                    pos = content.length();
-            }
-            else
-            {
-                size_t val_end = content.find(':', val_start);
-                if (val_end == std::string::npos) break;
-                value = content.substr(val_start, val_end - val_start);
-                pos = val_end + 1;
-            }
-
-            kv_map[key] = trim(value);
-        }
-
-        if (kv_map.find("key1") == kv_map.end() ||
-            kv_map.find("key2") == kv_map.end() ||
-            kv_map.find("key3") == kv_map.end())
-            continue;
-
+        std::istringstream iss(line.substr(2, line.length() - 4));
         DataStruct temp;
+        bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
         bool ok = true;
 
-        if (!parseDoubleSci(kv_map["key1"], temp.key1))
-            ok = false;
-
-        if (ok && !parseBinary(kv_map["key2"], temp.key2))
-            ok = false;
-
-        if (ok)
+        for (int i = 0; i < 3 && ok; ++i)
         {
-            std::string key3_raw = trim(kv_map["key3"]);
-            if (key3_raw.length() >= 2 && key3_raw.front() == '"' && key3_raw.back() == '"')
-                temp.key3 = key3_raw.substr(1, key3_raw.length() - 2);
-            else
+            std::string key;
+            char c;
+            while (iss.get(c) && c != ' ') key += c;
+            if (key.empty()) { ok = false; break; }
+
+            if (!readFieldValue(iss, key, temp, hasKey1, hasKey2, hasKey3))
+            {
                 ok = false;
+                break;
+            }
+
+            char sep;
+            if (iss.get(sep) && sep != ':')
+            {
+                if (sep == ')') break;
+                ok = false;
+                break;
+            }
         }
 
-        if (ok)
+        if (ok && hasKey1 && hasKey2 && hasKey3)
         {
             data = temp;
             return in;
