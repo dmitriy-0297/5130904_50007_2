@@ -155,73 +155,50 @@ std::istream& operator>>(std::istream& in, DataStruct& data)
 
         std::string content = line.substr(2, line.length() - 4);
 
-        size_t key1_pos = content.find("key1");
-        size_t key2_pos = content.find("key2");
-        size_t key3_pos = content.find("key3");
-
-        if (key1_pos == std::string::npos ||
-            key2_pos == std::string::npos ||
-            key3_pos == std::string::npos)
-        {
-            continue;
-        }
-
         DataStruct temp;
-        bool ok = true;
+        bool hasKey1 = false;
+        bool hasKey2 = false;
+        bool hasKey3 = false;
 
-        size_t start = content.find(' ', key1_pos);
-        if (start == std::string::npos) { ok = false; }
-        if (ok)
+        std::istringstream iss(content);
+        std::string token;
+
+        while (std::getline(iss, token, ':'))
         {
-            start = content.find_first_not_of(' ', start);
-            size_t end = content.find(':', start);
-            if (end == std::string::npos) { ok = false; }
-            if (ok)
+            token = trim(token);
+            if (token.empty()) continue;
+
+            size_t space_pos = token.find(' ');
+            if (space_pos == std::string::npos) continue;
+
+            std::string key = token.substr(0, space_pos);
+            std::string value = trim(token.substr(space_pos + 1));
+
+            if (key == "key1")
             {
-                std::string key1_str = content.substr(start, end - start);
-                if (!parseDoubleSci(key1_str, temp.key1)) { ok = false; }
+                if (parseDoubleSci(value, temp.key1))
+                {
+                    hasKey1 = true;
+                }
+            }
+            else if (key == "key2")
+            {
+                if (parseBinary(value, temp.key2))
+                {
+                    hasKey2 = true;
+                }
+            }
+            else if (key == "key3")
+            {
+                if (value.length() >= 2 && value.front() == '"' && value.back() == '"')
+                {
+                    temp.key3 = value.substr(1, value.length() - 2);
+                    hasKey3 = true;
+                }
             }
         }
 
-        if (ok)
-        {
-            start = content.find(' ', key2_pos);
-            if (start == std::string::npos) { ok = false; }
-        }
-        if (ok)
-        {
-            start = content.find_first_not_of(' ', start);
-            size_t end = content.find(':', start);
-            if (end == std::string::npos) { ok = false; }
-            if (ok)
-            {
-                std::string key2_str = content.substr(start, end - start);
-                if (!parseBinary(key2_str, temp.key2)) { ok = false; }
-            }
-        }
-
-        if (ok)
-        {
-            start = content.find(' ', key3_pos);
-            if (start == std::string::npos) { ok = false; }
-        }
-        if (ok)
-        {
-            start = content.find_first_not_of(' ', start);
-            if (start == std::string::npos || content[start] != '"') { ok = false; }
-        }
-        if (ok)
-        {
-            ++start;
-            size_t end = content.find('"', start);
-            if (end == std::string::npos) { ok = false; }
-            if (ok)
-            {
-                temp.key3 = content.substr(start, end - start);
-            }
-        }
-
-        if (ok)
+        if (hasKey1 && hasKey2 && hasKey3)
         {
             data = temp;
             return in;
