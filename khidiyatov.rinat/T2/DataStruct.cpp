@@ -45,7 +45,8 @@ std::istream& operator>>(std::istream& in, SignedLongLongIO&& dest)
     in.get(c1);
     in.get(c2);
 
-    if (in && std::tolower(c1) == 'l' && std::tolower(c2) == 'l')
+    if (in && std::tolower(static_cast<unsigned char>(c1)) == 'l' &&
+        std::tolower(static_cast<unsigned char>(c2)) == 'l')
     {
         dest.ref = temp;
     }
@@ -66,7 +67,7 @@ std::istream& operator>>(std::istream& in, ComplexIO&& dest)
     if (c != '#') { in.setstate(std::ios::failbit); return in; }
 
     in >> c;
-    if (std::tolower(c) != 'c') { in.setstate(std::ios::failbit); return in; }
+    if (std::tolower(static_cast<unsigned char>(c)) != 'c') { in.setstate(std::ios::failbit); return in; }
 
     in >> c;
     if (c != '(') { in.setstate(std::ios::failbit); return in; }
@@ -132,7 +133,8 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             std::string key;
             char kc = 0;
 
-            while (in.get(kc) && (std::isalpha(kc) || std::isdigit(kc)))
+            while (in.get(kc) && (std::isalpha(static_cast<unsigned char>(kc)) ||
+                std::isdigit(static_cast<unsigned char>(kc))))
             {
                 key += kc;
             }
@@ -197,9 +199,9 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& src)
     if (!sentry) return out;
 
     iofmtguard fmtguard(out);
-    out << "(:key1 " << src.key1_ << "ll "
-        << ":key2 #c(" << std::fixed << std::setprecision(1) << std::real(src.key2_) << " " << std::imag(src.key2_) << ") "
-        << ":key3 \"" << src.key3_ << "\":)";
+    out << "(:key1 " << src.key1_ << "ll";
+    out << ":key2#c(" << std::fixed << std::setprecision(1) << std::real(src.key2_) << " " << std::imag(src.key2_) << ")";
+    out << ":key3\"" << src.key3_ << "\":)";
     return out;
 }
 
