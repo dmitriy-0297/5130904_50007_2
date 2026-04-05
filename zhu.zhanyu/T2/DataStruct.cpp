@@ -130,6 +130,12 @@ static std::string formatBinary(unsigned long long value)
         value >>= 1;
     }
     std::reverse(result.begin(), result.end());
+
+    if (result.length() == 1)
+    {
+        result = "0" + result;
+    }
+
     return "0b" + result;
 }
 
