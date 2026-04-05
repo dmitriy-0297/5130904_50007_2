@@ -1,6 +1,5 @@
 #include "DataStruct.h"
 #include <iomanip>
-#include <sstream>
 #include <cctype>
 #include <cmath>
 
@@ -23,14 +22,11 @@ iofmtguard::~iofmtguard()
 
 std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
 {
-    std::istream::sentry sentry(in, true);
-    if (!sentry)
-    {
-        return in;
-    }
+    std::istream::sentry sentry(in);
+    if (!sentry) return in;
     char c = '0';
-    in.get(c);
-    if (in && (c != dest.exp))
+    in >> c;
+    if (in && c != dest.exp)
     {
         in.setstate(std::ios::failbit);
     }
@@ -39,104 +35,19 @@ std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
 
 std::istream& operator>>(std::istream& in, SignedLongLongIO&& dest)
 {
-    std::istream::sentry sentry(in, true);
-    if (!sentry)
-    {
-        return in;
-    }
-    std::string val;
-    in >> val;
-    if (val.length() < 3)
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-    std::string suffix = val.substr(val.length() - 2);
-    if (suffix != "ll" && suffix != "LL")
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-    try
-    {
-        dest.ref = std::stoll(val.substr(0, val.length() - 2));
-    }
-    catch (...)
-    {
-        in.setstate(std::ios::failbit);
-    }
-    return in;
-}
+    std::istream::sentry sentry(in);
+    if (!sentry) return in;
 
-std::istream& operator>>(std::istream& in, ComplexIO&& dest)
-{
-    std::istream::sentry sentry(in, true);
-    if (!sentry)
-    {
-        return in;
-    }
-    char c = '0';
-    in.get(c);
-    if (c != '#')
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-    in.get(c);
-    if (c != 'c')
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-    in.get(c);
-    if (c != '(')
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
+    long long temp;
+    if (!(in >> temp)) return in;
 
-    double realPart = 0.0;
-    double imagPart = 0.0;
-    in >> realPart >> imagPart;
-    if (!in)
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
+    char c1 = 0, c2 = 0;
+    in.get(c1);
+    in.get(c2);
 
-    in.get(c);
-    if (c != ')')
+    if (in && std::tolower(c1) == 'l' && std::tolower(c2) == 'l')
     {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    dest.ref = std::complex<double>(realPart, imagPart);
-    return in;
-}
-
-std::istream& operator>>(std::istream& in, StringIO&& dest)
-{
-    std::istream::sentry sentry(in, true);
-    if (!sentry)
-    {
-        return in;
-    }
-    char c = '0';
-    in.get(c);
-    if (c != '"')
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-    std::string val;
-    while (in.get(c) && c != '"')
-    {
-        val += c;
-    }
-    if (c == '"')
-    {
-        dest.ref = val;
+        dest.ref = temp;
     }
     else
     {
@@ -145,101 +56,151 @@ std::istream& operator>>(std::istream& in, StringIO&& dest)
     return in;
 }
 
-std::istream& operator>>(std::istream& in, DataStruct& dest)
+std::istream& operator>>(std::istream& in, ComplexIO&& dest)
 {
     std::istream::sentry sentry(in);
-    if (!sentry)
+    if (!sentry) return in;
+
+    char c = 0;
+    in >> c;
+    if (c != '#') { in.setstate(std::ios::failbit); return in; }
+
+    in >> c;
+    if (std::tolower(c) != 'c') { in.setstate(std::ios::failbit); return in; }
+
+    in >> c;
+    if (c != '(') { in.setstate(std::ios::failbit); return in; }
+
+    double realPart = 0.0, imagPart = 0.0;
+    if (!(in >> realPart >> imagPart)) return in;
+
+    in >> c;
+    if (c != ')') { in.setstate(std::ios::failbit); return in; }
+
+    dest.ref = std::complex<double>(realPart, imagPart);
+    return in;
+}
+
+std::istream& operator>>(std::istream& in, StringIO&& dest)
+{
+    std::istream::sentry sentry(in);
+    if (!sentry) return in;
+
+    char c = 0;
+    in >> c;
+    if (c != '"')
     {
+        in.setstate(std::ios::failbit);
         return in;
     }
 
-    std::string line;
-    while (std::getline(in, line))
+    std::string val;
+    std::getline(in, val, '"');
+    if (in)
     {
-        std::istringstream iss(line);
-        char startChar = '0';
-        iss >> std::skipws >> startChar;
-        if (startChar != '(')
-        {
-            continue;
-        }
+        dest.ref = val;
+    }
+    return in;
+}
 
-        iss >> std::noskipws;
-        char nextChar = '0';
-        iss.get(nextChar);
-        if (nextChar != ':')
+std::istream& operator>>(std::istream& in, DataStruct& dest)
+{
+    std::istream::sentry sentry(in);
+    if (!sentry) return in;
+
+    while (true)
+    {
+        char c = 0;
+
+        while (in >> c && c != '(') {}
+        if (!in) return in;
+
+        in >> c;
+        if (!in || c != ':')
         {
+            if (in.fail()) in.clear();
             continue;
         }
 
         DataStruct temp{};
-        bool hasKey1 = false;
-        bool hasKey2 = false;
-        bool hasKey3 = false;
-        const size_t FIELDS_COUNT = 3;
+        bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
+        bool valid = true;
 
-        for (size_t i = 0; i < FIELDS_COUNT; ++i)
+        for (int i = 0; i < 3; ++i)
         {
+            in >> std::ws;
             std::string key;
-            char c = '0';
-            while (iss.get(c) && c != ' ')
+            char kc = 0;
+
+            while (in.get(kc) && kc != ' ' && kc != '\t')
             {
-                key += c;
+                key += kc;
             }
-            if (c != ' ')
+
+            if (!in)
             {
-                iss.setstate(std::ios::failbit);
+                valid = false;
                 break;
             }
 
-            if (key == ":key1")
+            if (key == "key1")
             {
-                iss >> SignedLongLongIO{ temp.key1_ };
-                hasKey1 = true;
+                if (!(in >> SignedLongLongIO{ temp.key1_ })) valid = false;
+                else hasKey1 = true;
             }
-            else if (key == ":key2")
+            else if (key == "key2")
             {
-                iss >> ComplexIO{ temp.key2_ };
-                hasKey2 = true;
+                if (!(in >> ComplexIO{ temp.key2_ })) valid = false;
+                else hasKey2 = true;
             }
-            else if (key == ":key3")
+            else if (key == "key3")
             {
-                iss >> StringIO{ temp.key3_ };
-                hasKey3 = true;
+                if (!(in >> StringIO{ temp.key3_ })) valid = false;
+                else hasKey3 = true;
             }
             else
             {
-                iss.setstate(std::ios::failbit);
-                break;
+                valid = false;
             }
 
-            if (i < FIELDS_COUNT - 1)
+            if (!valid) break;
+
+            if (!(in >> DelimiterIO{ ':' }))
             {
-                iss >> DelimiterIO{ ':' };
-            }
-            else
-            {
-                iss >> DelimiterIO{ ':' } >> DelimiterIO{ ')' };
+                valid = false;
+                break;
             }
         }
 
-        if (iss && hasKey1 && hasKey2 && hasKey3)
+        if (!valid)
         {
-            dest = std::move(temp);
+            if (in.fail()) in.clear();
+            continue;
+        }
+
+        if (!(in >> DelimiterIO{ ')' }))
+        {
+            if (in.fail()) in.clear();
+            continue;
+        }
+
+        if (hasKey1 && hasKey2 && hasKey3)
+        {
+            dest = temp;
             return in;
         }
+        else
+        {
+            if (in.fail()) in.clear();
+        }
     }
-    in.setstate(std::ios::failbit);
-    return in;
 }
 
 std::ostream& operator<<(std::ostream& out, const DataStruct& src)
 {
     std::ostream::sentry sentry(out);
-    if (!sentry)
-    {
-        return out;
-    }
+    if (!sentry) return out;
+
     iofmtguard fmtguard(out);
     out << "(:key1 " << src.key1_ << "ll";
     out << ":key2#c(" << std::fixed << std::setprecision(1) << std::real(src.key2_) << " " << std::imag(src.key2_) << ")";
@@ -253,8 +214,10 @@ bool compareDataStruct(const DataStruct& a, const DataStruct& b)
     {
         return a.key1_ < b.key1_;
     }
+
     double modA = std::abs(a.key2_);
     double modB = std::abs(b.key2_);
+
     if (modA != modB)
     {
         return modA < modB;
