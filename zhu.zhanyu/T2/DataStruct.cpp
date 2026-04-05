@@ -93,6 +93,11 @@ static std::string formatDoubleSci(double value)
             }
         }
 
+        if (mantissa.find('.') == std::string::npos)
+        {
+            mantissa += ".0";
+        }
+
         if (exponent.length() > 2 && exponent[0] == 'e')
         {
             char sign = exponent[1];
@@ -131,99 +136,93 @@ static std::string formatBinary(unsigned long long value)
 std::istream& operator>>(std::istream& in, DataStruct& data)
 {
     std::string line;
-    if (!std::getline(in, line))
+    while (std::getline(in, line))
     {
-        return in;
+        line = trim(line);
+
+        if (line.length() < 4 ||
+            line.substr(0, 2) != "(:" ||
+            line.substr(line.length() - 2) != ":)")
+        {
+            continue;
+        }
+
+        std::string content = line.substr(2, line.length() - 4);
+
+        size_t key1_pos = content.find("key1");
+        size_t key2_pos = content.find("key2");
+        size_t key3_pos = content.find("key3");
+
+        if (key1_pos == std::string::npos ||
+            key2_pos == std::string::npos ||
+            key3_pos == std::string::npos)
+        {
+            continue;
+        }
+
+        DataStruct temp;
+        bool ok = true;
+
+        size_t start = content.find(' ', key1_pos);
+        if (start == std::string::npos) { ok = false; }
+        if (ok)
+        {
+            start = content.find_first_not_of(' ', start);
+            size_t end = content.find(':', start);
+            if (end == std::string::npos) { ok = false; }
+            if (ok)
+            {
+                std::string key1_str = content.substr(start, end - start);
+                if (!parseDoubleSci(key1_str, temp.key1)) { ok = false; }
+            }
+        }
+
+        if (ok)
+        {
+            start = content.find(' ', key2_pos);
+            if (start == std::string::npos) { ok = false; }
+        }
+        if (ok)
+        {
+            start = content.find_first_not_of(' ', start);
+            size_t end = content.find(':', start);
+            if (end == std::string::npos) { ok = false; }
+            if (ok)
+            {
+                std::string key2_str = content.substr(start, end - start);
+                if (!parseBinary(key2_str, temp.key2)) { ok = false; }
+            }
+        }
+
+        if (ok)
+        {
+            start = content.find(' ', key3_pos);
+            if (start == std::string::npos) { ok = false; }
+        }
+        if (ok)
+        {
+            start = content.find_first_not_of(' ', start);
+            if (start == std::string::npos || content[start] != '"') { ok = false; }
+        }
+        if (ok)
+        {
+            ++start;
+            size_t end = content.find('"', start);
+            if (end == std::string::npos) { ok = false; }
+            if (ok)
+            {
+                temp.key3 = content.substr(start, end - start);
+            }
+        }
+
+        if (ok)
+        {
+            data = temp;
+            return in;
+        }
     }
 
-    line = trim(line);
-
-    if (line.length() < 4 ||
-        line.substr(0, 2) != "(:" ||
-        line.substr(line.length() - 2) != ":)")
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    std::string content = line.substr(2, line.length() - 4);
-
-    size_t key1_pos = content.find("key1");
-    size_t key2_pos = content.find("key2");
-    size_t key3_pos = content.find("key3");
-
-    if (key1_pos == std::string::npos ||
-        key2_pos == std::string::npos ||
-        key3_pos == std::string::npos)
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    // 解析 key1
-    size_t start = content.find(' ', key1_pos);
-    if (start == std::string::npos)
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-    start = content.find_first_not_of(' ', start);
-    size_t end = content.find(':', start);
-    if (end == std::string::npos)
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-    std::string key1_str = content.substr(start, end - start);
-    if (!parseDoubleSci(key1_str, data.key1))
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    // 解析 key2
-    start = content.find(' ', key2_pos);
-    if (start == std::string::npos)
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-    start = content.find_first_not_of(' ', start);
-    end = content.find(':', start);
-    if (end == std::string::npos)
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-    std::string key2_str = content.substr(start, end - start);
-    if (!parseBinary(key2_str, data.key2))
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    // 解析 key3
-    start = content.find(' ', key3_pos);
-    if (start == std::string::npos)
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-    start = content.find_first_not_of(' ', start);
-    if (start == std::string::npos || content[start] != '"')
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-    ++start;
-    end = content.find('"', start);
-    if (end == std::string::npos)
-    {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-    data.key3 = content.substr(start, end - start);
-
+    in.setstate(std::ios::failbit);
     return in;
 }
 
@@ -251,30 +250,20 @@ bool compareDataStruct(const DataStruct& a, const DataStruct& b)
 int main()
 {
     std::vector<DataStruct> data;
-    std::string line;
 
-    while (std::getline(std::cin, line))
-    {
-        if (line.empty())
-        {
-            continue;
-        }
-
-        std::istringstream iss(line);
-        DataStruct temp;
-
-        if (iss >> temp)
-        {
-            data.push_back(temp);
-        }
-    }
+    std::copy(
+        std::istream_iterator<DataStruct>(std::cin),
+        std::istream_iterator<DataStruct>(),
+        std::back_inserter(data)
+    );
 
     std::sort(data.begin(), data.end(), compareDataStruct);
 
-    for (const auto& item : data)
-    {
-        std::cout << item << "\n";
-    }
+    std::copy(
+        data.begin(),
+        data.end(),
+        std::ostream_iterator<DataStruct>(std::cout, "\n")
+    );
 
     return 0;
 }
