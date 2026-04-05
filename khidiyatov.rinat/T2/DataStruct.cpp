@@ -132,16 +132,11 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             std::string key;
             char kc = 0;
 
-            while (in.get(kc) && kc != ' ' && kc != '\t')
+            while (in.get(kc) && (std::isalpha(kc) || std::isdigit(kc)))
             {
                 key += kc;
             }
-
-            if (!in)
-            {
-                valid = false;
-                break;
-            }
+            if (in) in.unget();
 
             if (key == "key1")
             {
@@ -202,9 +197,9 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& src)
     if (!sentry) return out;
 
     iofmtguard fmtguard(out);
-    out << "(:key1 " << src.key1_ << "ll";
-    out << ":key2#c(" << std::fixed << std::setprecision(1) << std::real(src.key2_) << " " << std::imag(src.key2_) << ")";
-    out << ":key3\"" << src.key3_ << "\":)";
+    out << "(:key1 " << src.key1_ << "ll "
+        << ":key2 #c(" << std::fixed << std::setprecision(1) << std::real(src.key2_) << " " << std::imag(src.key2_) << ") "
+        << ":key3 \"" << src.key3_ << "\":)";
     return out;
 }
 
