@@ -43,18 +43,18 @@ std::istream& operator>>(std::istream& in, SignedLongLongIO&& dest)
     }
     std::string token;
     in >> token;
-    if (token.length() < 3) {
+    if (token.size() < 3) {
         in.setstate(std::ios::failbit);
         return in;
     }
-    std::string suffix = token.substr(token.length() - 2);
+    std::string suffix = token.substr(token.size() - 2);
     if (suffix != "ll" && suffix != "LL") {
         in.setstate(std::ios::failbit);
         return in;
     }
     try {
-        std::string numPart = token.substr(0, token.length() - 2);
-        dest.ref = std::stoll(numPart);
+        std::string num = token.substr(0, token.size() - 2);
+        dest.ref = std::stoll(num);
     }
     catch (...) {
         in.setstate(std::ios::failbit);
@@ -147,7 +147,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         for (int i = 0; i < 3; ++i) {
             std::string key;
             char kc = 0;
-            while (iss.get(kc) && kc != ' ' && kc != ':') {
+            while (iss.get(kc) && std::isalnum(static_cast<unsigned char>(kc))) {
                 key += kc;
             }
             if (kc != ' ') {
@@ -204,9 +204,9 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& src)
     }
     iofmtguard fmtguard(out);
     out << "(:key1 " << src.key1_ << "ll ";
-    out << ":key2#c(" << std::fixed << std::setprecision(1);
+    out << ":key2 #c(" << std::fixed << std::setprecision(1);
     out << std::real(src.key2_) << " " << std::imag(src.key2_) << ") ";
-    out << ":key3\"" << src.key3_ << "\":)";
+    out << ":key3 \"" << src.key3_ << "\":)";
     return out;
 }
 
