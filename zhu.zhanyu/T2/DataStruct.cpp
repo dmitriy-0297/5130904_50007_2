@@ -104,8 +104,8 @@ std::istream& operator>>(std::istream& in, DataStruct& data)
             continue;
 
         std::string content = line.substr(2, line.length() - 4);
-
         std::map<std::string, std::string> kv_map;
+
         size_t pos = 0;
         while (pos < content.length())
         {
