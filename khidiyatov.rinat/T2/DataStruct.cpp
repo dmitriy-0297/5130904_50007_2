@@ -27,7 +27,7 @@ std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
     if (!sentry) {
         return in;
     }
-    char c = '0';
+    char c = 0;
     in >> c;
     if (in && c != dest.exp) {
         in.setstate(std::ios::failbit);
@@ -75,7 +75,7 @@ std::istream& operator>>(std::istream& in, ComplexIO&& dest)
         return in;
     }
     in >> c;
-    if (std::tolower(c) != 'c') {
+    if (std::tolower(static_cast<unsigned char>(c)) != 'c') {
         in.setstate(std::ios::failbit);
         return in;
     }
@@ -139,7 +139,6 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         if (c != ':') {
             continue;
         }
-        iss >> std::noskipws;
         DataStruct temp{};
         bool hasKey1 = false;
         bool hasKey2 = false;
@@ -189,6 +188,9 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             dest = std::move(temp);
             return in;
         }
+        if (iss.fail() && !iss.eof()) {
+            iss.clear();
+        }
     }
     in.setstate(std::ios::failbit);
     return in;
@@ -201,9 +203,9 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& src)
         return out;
     }
     iofmtguard fmtguard(out);
-    out << "(:key1 " << src.key1_ << "ll";
+    out << "(:key1 " << src.key1_ << "ll ";
     out << ":key2#c(" << std::fixed << std::setprecision(1);
-    out << std::real(src.key2_) << " " << std::imag(src.key2_) << ")";
+    out << std::real(src.key2_) << " " << std::imag(src.key2_) << ") ";
     out << ":key3\"" << src.key3_ << "\":)";
     return out;
 }
