@@ -10,7 +10,7 @@ namespace kulikov
   {
     unsigned long long key1;
     unsigned long long key2;
-    std::string key2Raw;
+    std::string key2Bin;
     std::string key3;
   };
 
