@@ -50,8 +50,8 @@ std::istream& operator>>(std::istream& in, UllLitIO&& dest)
     {
         char suf[3] = {0, 0, 0};
         in.get(suf, 3);
-        if (in && (std::tolower(suf[0]) == 'u' && 
-                   std::tolower(suf[1]) == 'l' && 
+        if (in && (std::tolower(suf[0]) == 'u' &&
+                   std::tolower(suf[1]) == 'l' &&
                    std::tolower(suf[2]) == 'l'))
         {
             dest.ref = v;
@@ -107,10 +107,10 @@ std::istream& operator>>(std::istream& in, StringIO&& dest)
     {
         return in;
     }
-    
+
     // Пропускаем пробелы перед кавычкой
     in >> std::skipws;
-    
+
     char c = '0';
     in.get(c);
     if (c != '"')
@@ -141,42 +141,42 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
     {
         return in;
     }
-    
+
     DataStruct temp;
     bool hasKey1 = false;
     bool hasKey2 = false;
     bool hasKey3 = false;
-    
+
     using sep = DelimiterIO;
     using ull = UllLitIO;
     using bin = UllBinIO;
     using str = StringIO;
-    
+
     if (!(in >> sep{ '(' } >> sep{ ':' }))
     {
         in.setstate(std::ios::failbit);
         return in;
     }
-    
+
     char c = 0;
     std::string key;
-    
+
     while (in && !(hasKey1 && hasKey2 && hasKey3))
     {
         in >> std::skipws >> c;
-        
+
         if (c == ')')
         {
             break;
         }
         in.putback(c);
-        
+
         key.clear();
         while (in.get(c) && c != ' ' && c != '"')
         {
             key += c;
         }
-        
+
         if (key == "key1" && !hasKey1)
         {
             if (c == ' ')
@@ -254,18 +254,18 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             in.setstate(std::ios::failbit);
             break;
         }
-        
+
         if (!(in >> std::skipws >> sep{ ':' }))
         {
             break;
         }
     }
-    
+
     if (in && hasKey1 && hasKey2 && hasKey3)
     {
         in >> sep{ ')' };
     }
-    
+
     if (in && hasKey1 && hasKey2 && hasKey3)
     {
         dest = std::move(temp);
@@ -274,7 +274,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
     {
         in.setstate(std::ios::failbit);
     }
-    
+
     return in;
 }
 
