@@ -27,7 +27,7 @@ Point CompositeShape::getCenter() const
   {
     throw std::logic_error("Composite shape is empty");
   }
-  
+
   double minX = shapes_[0]->getCenter().x_;
   double maxX = minX;
   double minY = shapes_[0]->getCenter().y_;
@@ -64,7 +64,7 @@ void CompositeShape::scale(double factor)
   {
     throw std::invalid_argument("Scale factor must be positive");
   }
-  
+
   Point commonCenter = getCenter();
   for (auto& shape : shapes_)
   {
