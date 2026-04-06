@@ -20,6 +20,7 @@ namespace mashkin
     struct UllBinIO
     {
       unsigned long long & value;
+      std::string & raw;
     };
 
     struct StringIO
@@ -98,6 +99,7 @@ namespace mashkin
         val = (val << 1) | (bit - '0');
       }
       dest.value = val;
+      dest.raw = digits;
       return in;
     }
 
@@ -172,7 +174,7 @@ namespace mashkin
         }
         else if (key == "key2")
         {
-          if (!(in >> UllBinIO{tmp.key2}))
+          if (!(in >> UllBinIO{tmp.key2, tmp.key2Raw}))
           {
             break;
           }
@@ -217,22 +219,7 @@ namespace mashkin
       return out;
     }
     out << "(:key1 " << data.key1 << "ull";
-    out << ":key2 0b";
-    if (data.key2 == 0)
-    {
-      out << '0';
-    }
-    else
-    {
-      std::string bits;
-      unsigned long long val = data.key2;
-      while (val > 0)
-      {
-        bits = char('0' + (val & 1)) + bits;
-        val >>= 1;
-      }
-      out << bits;
-    }
+    out << ":key2 0b" << data.key2Raw;
     out << ":key3 \"" << data.key3 << "\":)";
     return out;
   }
