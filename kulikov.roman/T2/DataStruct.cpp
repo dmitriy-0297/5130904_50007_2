@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-namespace mashkin
+namespace kulikov
 {
   namespace
   {
