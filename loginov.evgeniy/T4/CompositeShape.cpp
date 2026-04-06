@@ -1,0 +1,82 @@
+#include "CompositeShape.h"
+#include <stdexcept>
+#include <algorithm>
+
+void CompositeShape::addShape(std::unique_ptr<Shape> shape)
+{
+  if (!shape)
+  {
+    throw std::invalid_argument("Null pointer shape");
+  }
+  shapes_.push_back(std::move(shape));
+}
+
+double CompositeShape::getArea() const
+{
+  double totalArea = 0.0;
+  for (const auto& shape : shapes_)
+  {
+    totalArea += shape->getArea();
+  }
+  return totalArea;
+}
+
+Point CompositeShape::getCenter() const
+{
+  if (shapes_.empty())
+  {
+    throw std::logic_error("Composite shape is empty");
+  }
+  
+  double minX = shapes_[0]->getCenter().x_;
+  double maxX = minX;
+  double minY = shapes_[0]->getCenter().y_;
+  double maxY = minY;
+
+  for (const auto& shape : shapes_)
+  {
+    Point c = shape->getCenter();
+    minX = std::min(minX, c.x_);
+    maxX = std::max(maxX, c.x_);
+    minY = std::min(minY, c.y_);
+    maxY = std::max(maxY, c.y_);
+  }
+  return {(minX + maxX) / 2.0, (minY + maxY) / 2.0};
+}
+
+void CompositeShape::move(double dx, double dy)
+{
+  for (auto& shape : shapes_)
+  {
+    shape->move(dx, dy);
+  }
+}
+
+void CompositeShape::move(const Point& newCenter)
+{
+  Point currentCenter = getCenter();
+  move(newCenter.x_ - currentCenter.x_, newCenter.y_ - currentCenter.y_);
+}
+
+void CompositeShape::scale(double factor)
+{
+  if (factor <= 0.0)
+  {
+    throw std::invalid_argument("Scale factor must be positive");
+  }
+  
+  Point commonCenter = getCenter();
+  for (auto& shape : shapes_)
+  {
+    Point shapeCenter = shape->getCenter();
+    double dx = (shapeCenter.x_ - commonCenter.x_) * (factor - 1.0);
+    double dy = (shapeCenter.y_ - commonCenter.y_) * (factor - 1.0);
+    shape->move(dx, dy);
+    shape->scale(factor);
+  }
+}
+
+std::string CompositeShape::getName() const
+{
+  return "COMPOSITE";
+}
