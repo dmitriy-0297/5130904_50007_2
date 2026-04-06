@@ -20,7 +20,7 @@ namespace kulikov
     struct UllBinIO
     {
       unsigned long long & value;
-      std::string & raw;
+      std::string & bin;
     };
 
     struct StringIO
@@ -99,7 +99,7 @@ namespace kulikov
         val = (val << 1) | (bit - '0');
       }
       dest.value = val;
-      dest.raw = digits;
+      dest.bin = digits;
       return in;
     }
 
@@ -174,7 +174,7 @@ namespace kulikov
         }
         else if (key == "key2")
         {
-          if (!(in >> UllBinIO{tmp.key2, tmp.key2Raw}))
+          if (!(in >> UllBinIO{tmp.key2, tmp.key2Bin}))
           {
             break;
           }
@@ -219,7 +219,7 @@ namespace kulikov
       return out;
     }
     out << "(:key1 " << data.key1 << "ull";
-    out << ":key2 0b" << data.key2Raw;
+    out << ":key2 0b" << data.key2Bin;
     out << ":key3 \"" << data.key3 << "\":)";
     return out;
   }
