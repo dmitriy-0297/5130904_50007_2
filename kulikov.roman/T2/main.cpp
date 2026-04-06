@@ -1,22 +1,32 @@
 #include <iostream>
 #include <vector>
-#include <iterator>
 #include <algorithm>
 #include "DataStruct.h"
 
 int main()
 {
-    std::vector<DataStruct> data;
-    std::copy(
-        std::istream_iterator<DataStruct>(std::cin),
-        std::istream_iterator<DataStruct>(),
-        std::back_inserter(data)
-    );
-    std::sort(std::begin(data), std::end(data), compareDataStruct);
-    std::copy(
-        std::begin(data),
-        std::end(data),
-        std::ostream_iterator<DataStruct>(std::cout, "\n")
-    );
+    std::vector<DataStruct> records;
+    DataStruct temp;
+
+    while (std::cin >> temp)
+    {
+        records.push_back(temp);
+    }
+
+    if (records.empty())
+    {
+        std::cerr << "Looks like there is no supported record. Cannot determine input. Test skipped" << std::endl;
+        return 0;
+    }
+
+    std::cout << "Atleast one supported record type" << std::endl;
+
+    std::sort(records.begin(), records.end(), compareDataStruct);
+
+    for (const auto& record : records)
+    {
+        std::cout << record << std::endl;
+    }
+
     return 0;
 }
