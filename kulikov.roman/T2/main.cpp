@@ -8,11 +8,11 @@
 
 int main()
 {
-  std::vector< mashkin::DataStruct > data;
+  std::vector< kulikov::DataStruct > data;
 
   while (!std::cin.eof())
   {
-    mashkin::DataStruct tmp{};
+    kulikov::DataStruct tmp{};
     if (std::cin >> tmp)
     {
       data.push_back(tmp);
@@ -25,12 +25,12 @@ int main()
     }
   }
 
-  std::sort(data.begin(), data.end(), mashkin::DataStructComparator{});
+  std::sort(data.begin(), data.end(), kulikov::DataStructComparator{});
 
   std::copy(
     data.cbegin(),
     data.cend(),
-    std::ostream_iterator< mashkin::DataStruct >(std::cout, "\n")
+    std::ostream_iterator< kulikov::DataStruct >(std::cout, "\n")
   );
 
   return 0;
