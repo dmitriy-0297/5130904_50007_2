@@ -4,12 +4,12 @@
 #include <cctype>
 #include <algorithm>
 
-iofmtguard::iofmtguard(std::basic_ios<char>& s) :
-    s_(s),
-    width_(s.width()),
-    fill_(s.fill()),
-    precision_(s.precision()),
-    fmt_(s.flags())
+iofmtguard::iofmtguard(std::basic_ios<char>& s)
+    : s_(s)
+    , width_(s.width())
+    , fill_(s.fill())
+    , precision_(s.precision())
+    , fmt_(s.flags())
 {
 }
 
@@ -107,9 +107,7 @@ std::istream& operator>>(std::istream& in, StringIO&& dest)
     {
         return in;
     }
-
     in >> std::skipws;
-
     char c = '0';
     in.get(c);
     if (c != '"')
@@ -140,47 +138,39 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
     {
         return in;
     }
-
     DataStruct temp;
     bool hasKey1 = false;
     bool hasKey2 = false;
     bool hasKey3 = false;
-
     using sep = DelimiterIO;
     using ull = UllLitIO;
     using bin = UllBinIO;
     using str = StringIO;
-
-    if (!(in >> sep{ '(' } >> sep{ ':' }))
+    if (!(in >> sep{'('} >> sep{':'}))
     {
         in.setstate(std::ios::failbit);
         return in;
     }
-
     char c = 0;
     std::string key;
-
     while (in && !(hasKey1 && hasKey2 && hasKey3))
     {
         in >> std::skipws >> c;
-
         if (c == ')')
         {
             break;
         }
         in.putback(c);
-
         key.clear();
         while (in.get(c) && c != ' ' && c != '"')
         {
             key += c;
         }
-
         if (key == "key1" && !hasKey1)
         {
             if (c == ' ')
             {
-                if (in >> ull{ temp.key1 })
+                if (in >> ull{temp.key1})
                 {
                     hasKey1 = true;
                 }
@@ -199,7 +189,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
         {
             if (c == ' ')
             {
-                if (in >> bin{ temp.key2 })
+                if (in >> bin{temp.key2})
                 {
                     hasKey2 = true;
                 }
@@ -220,7 +210,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             {
                 if (c == ' ')
                 {
-                    if (in >> str{ temp.key3 })
+                    if (in >> str{temp.key3})
                     {
                         hasKey3 = true;
                     }
@@ -232,7 +222,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
                 else
                 {
                     in.putback(c);
-                    if (in >> str{ temp.key3 })
+                    if (in >> str{temp.key3})
                     {
                         hasKey3 = true;
                     }
@@ -253,18 +243,15 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             in.setstate(std::ios::failbit);
             break;
         }
-
-        if (!(in >> std::skipws >> sep{ ':' }))
+        if (!(in >> std::skipws >> sep{':'}))
         {
             break;
         }
     }
-
     if (in && hasKey1 && hasKey2 && hasKey3)
     {
-        in >> sep{ ')' };
+        in >> sep{')'};
     }
-
     if (in && hasKey1 && hasKey2 && hasKey3)
     {
         dest = std::move(temp);
@@ -273,7 +260,6 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
     {
         in.setstate(std::ios::failbit);
     }
-
     return in;
 }
 
