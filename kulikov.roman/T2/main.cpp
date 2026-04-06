@@ -1,32 +1,36 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
 #include "DataStruct.h"
+
+#include <algorithm>
+#include <iostream>
+#include <iterator>
+#include <vector>
 
 int main()
 {
-    std::vector<DataStruct> records;
-    DataStruct temp;
+  std::vector< mashkin::DataStruct > data;
 
-    while (std::cin >> temp)
+  while (!std::cin.eof())
+  {
+    mashkin::DataStruct tmp{};
+    if (std::cin >> tmp)
     {
-        records.push_back(temp);
+      data.push_back(tmp);
     }
-
-    if (records.empty())
+    else
     {
-        std::cerr << "Looks like there is no supported record. Cannot determine input. Test skipped" << std::endl;
-        return 0;
+      std::cin.clear();
+      std::string skip;
+      std::getline(std::cin, skip);
     }
+  }
 
-    std::cout << "Atleast one supported record type" << std::endl;
+  std::sort(data.begin(), data.end(), mashkin::DataStructComparator{});
 
-    std::sort(records.begin(), records.end(), compareDataStruct);
+  std::copy(
+    data.cbegin(),
+    data.cend(),
+    std::ostream_iterator< mashkin::DataStruct >(std::cout, "\n")
+  );
 
-    for (const auto& record : records)
-    {
-        std::cout << record << std::endl;
-    }
-
-    return 0;
+  return 0;
 }

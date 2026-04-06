@@ -1,306 +1,261 @@
 #include "DataStruct.h"
-#include <iomanip>
-#include <sstream>
-#include <cctype>
-#include <algorithm>
 
-iofmtguard::iofmtguard(std::basic_ios<char>& s)
-    : s_(s)
-    , width_(s.width())
-    , fill_(s.fill())
-    , precision_(s.precision())
-    , fmt_(s.flags())
-{
-}
+#include <iostream>
+#include <string>
+#include <stdexcept>
 
-iofmtguard::~iofmtguard()
+namespace mashkin
 {
-    s_.width(width_);
-    s_.fill(fill_);
-    s_.precision(precision_);
-    s_.flags(fmt_);
-}
-
-std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
-{
-    std::istream::sentry sentry(in, true);
-    if (!sentry)
+  namespace
+  {
+    struct DelimiterIO
     {
-        return in;
-    }
-    char c = '0';
-    in.get(c);
-    if (in && (c != dest.exp))
+      char expected;
+    };
+
+    struct UllLitIO
     {
+      unsigned long long & value;
+    };
+
+    struct UllBinIO
+    {
+      unsigned long long & value;
+    };
+
+    struct StringIO
+    {
+      std::string & value;
+    };
+
+    std::istream & operator>>(std::istream & in, DelimiterIO && dest)
+    {
+      char c = '\0';
+      in >> c;
+      if (in && c != dest.expected)
+      {
         in.setstate(std::ios::failbit);
+      }
+      return in;
     }
-    return in;
-}
 
-std::istream& operator>>(std::istream& in, UllLitIO&& dest)
-{
-    std::istream::sentry sentry(in, true);
-    if (!sentry)
+    std::istream & operator>>(std::istream & in, UllLitIO && dest)
     {
+      unsigned long long val = 0;
+      in >> val;
+      if (!in)
+      {
         return in;
-    }
-    unsigned long long v = 0;
-    in >> v;
-    if (in)
-    {
-        char suf[3] = {0, 0, 0};
-        in.get(suf, 3);
-        if (in && (std::tolower(suf[0]) == 'u' &&
-                   std::tolower(suf[1]) == 'l' &&
-                   std::tolower(suf[2]) == 'l'))
-        {
-            dest.ref = v;
-        }
-        else
-        {
-            in.setstate(std::ios::failbit);
-        }
-    }
-    return in;
-}
-
-std::istream& operator>>(std::istream& in, UllBinIO&& dest)
-{
-    std::istream::sentry sentry(in, true);
-    if (!sentry)
-    {
+      }
+      char c1 = '\0';
+      char c2 = '\0';
+      in >> c1 >> c2;
+      if (!in)
+      {
         return in;
-    }
-    char p[2] = {0, 0};
-    in.get(p, 3);
-    if (in && (p[0] == '0') && (std::tolower(p[1]) == 'b'))
-    {
-        unsigned long long v = 0;
-        in >> std::noskipws;
-        char c = 0;
-        while (in.get(c) && (c == '0' || c == '1'))
-        {
-            v = (v << 1) | (c - '0');
-        }
-        in >> std::skipws;
-        if (in || in.eof())
-        {
-            dest.ref = v;
-            in.clear();
-        }
-        else
-        {
-            in.setstate(std::ios::failbit);
-        }
-    }
-    else
-    {
-        in.setstate(std::ios::failbit);
-    }
-    return in;
-}
-
-std::istream& operator>>(std::istream& in, StringIO&& dest)
-{
-    std::istream::sentry sentry(in, true);
-    if (!sentry)
-    {
-        return in;
-    }
-    // Skip whitespace before quote
-    in >> std::skipws;
-    char c = '0';
-    in.get(c);
-    if (c != '"')
-    {
+      }
+      bool isLower = (c1 == 'u' && c2 == 'l');
+      bool isUpper = (c1 == 'U' && c2 == 'L');
+      if (!isLower && !isUpper)
+      {
         in.setstate(std::ios::failbit);
         return in;
-    }
-    std::string val = "";
-    while (in.get(c) && c != '"')
-    {
-        val += c;
-    }
-    if (c == '"')
-    {
-        dest.ref = val;
-    }
-    else
-    {
+      }
+      char c3 = '\0';
+      in >> c3;
+      if (!in)
+      {
+        return in;
+      }
+      if (c3 != 'l' && c3 != 'L')
+      {
         in.setstate(std::ios::failbit);
+        return in;
+      }
+      dest.value = val;
+      return in;
     }
-    return in;
-}
 
-std::istream& operator>>(std::istream& in, DataStruct& dest)
-{
+    std::istream & operator>>(std::istream & in, UllBinIO && dest)
+    {
+      char c0 = '\0';
+      char cB = '\0';
+      in >> c0 >> cB;
+      if (!in || c0 != '0' || (cB != 'b' && cB != 'B'))
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      unsigned long long val = 0;
+      std::string digits;
+      char ch = '\0';
+      while (in.get(ch) && (ch == '0' || ch == '1'))
+      {
+        digits += ch;
+      }
+      if (in)
+      {
+        in.putback(ch);
+      }
+      if (digits.empty())
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      for (char bit : digits)
+      {
+        val = (val << 1) | (bit - '0');
+      }
+      dest.value = val;
+      return in;
+    }
+
+    std::istream & operator>>(std::istream & in, StringIO && dest)
+    {
+      char c = '\0';
+      in >> c;
+      if (!in || c != '"')
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      std::string result;
+      while (in.get(c) && c != '"')
+      {
+        result += c;
+      }
+      if (!in)
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
+      dest.value = result;
+      return in;
+    }
+  }
+
+  std::istream & operator>>(std::istream & in, DataStruct & data)
+  {
     std::istream::sentry sentry(in);
     if (!sentry)
     {
-        return in;
+      return in;
     }
-    DataStruct temp;
+    DataStruct tmp{};
     bool hasKey1 = false;
     bool hasKey2 = false;
     bool hasKey3 = false;
-    using sep = DelimiterIO;
-    using ull = UllLitIO;
-    using bin = UllBinIO;
-    using str = StringIO;
-    if (!(in >> sep{'('} >> sep{':'}))
+    in >> DelimiterIO{'('};
+    if (!in)
     {
-        in.setstate(std::ios::failbit);
-        return in;
+      return in;
     }
-    char c = 0;
-    std::string key;
-    while (in && !(hasKey1 && hasKey2 && hasKey3))
+    while (true)
     {
-        in >> std::skipws >> c;
-        if (c == ')')
+      char colon = '\0';
+      in >> colon;
+      if (!in)
+      {
+        break;
+      }
+      if (colon == ':')
+      {
+        char peek = in.peek();
+        if (peek == ')')
         {
+          in.get();
+          break;
+        }
+        std::string key;
+        if (!(in >> key))
+        {
+          break;
+        }
+        if (key == "key1")
+        {
+          if (!(in >> UllLitIO{tmp.key1}))
+          {
             break;
+          }
+          hasKey1 = true;
         }
-        in.putback(c);
-        key.clear();
-        while (in.get(c) && c != ' ' && c != '"')
+        else if (key == "key2")
         {
-            key += c;
+          if (!(in >> UllBinIO{tmp.key2}))
+          {
+            break;
+          }
+          hasKey2 = true;
         }
-        if (key == "key1" && !hasKey1)
+        else if (key == "key3")
         {
-            if (c == ' ')
-            {
-                if (in >> ull{temp.key1})
-                {
-                    hasKey1 = true;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            else
-            {
-                in.setstate(std::ios::failbit);
-                break;
-            }
-        }
-        else if (key == "key2" && !hasKey2)
-        {
-            if (c == ' ')
-            {
-                if (in >> bin{temp.key2})
-                {
-                    hasKey2 = true;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            else
-            {
-                in.setstate(std::ios::failbit);
-                break;
-            }
-        }
-        else if (key == "key3" && !hasKey3)
-        {
-            if (c == '"' || c == ' ')
-            {
-                if (c == ' ')
-                {
-                    if (in >> str{temp.key3})
-                    {
-                        hasKey3 = true;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    in.putback(c);
-                    if (in >> str{temp.key3})
-                    {
-                        hasKey3 = true;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                in.setstate(std::ios::failbit);
-                break;
-            }
+          if (!(in >> StringIO{tmp.key3}))
+          {
+            break;
+          }
+          hasKey3 = true;
         }
         else
         {
-            in.setstate(std::ios::failbit);
-            break;
+          in.setstate(std::ios::failbit);
+          break;
         }
-        if (!(in >> std::skipws >> sep{':'}))
-        {
-            break;
-        }
+      }
+      else
+      {
+        in.setstate(std::ios::failbit);
+        break;
+      }
     }
     if (in && hasKey1 && hasKey2 && hasKey3)
     {
-        in >> sep{')'};
-    }
-    if (in && hasKey1 && hasKey2 && hasKey3)
-    {
-        dest = std::move(temp);
+      data = tmp;
     }
     else
     {
-        in.setstate(std::ios::failbit);
+      in.setstate(std::ios::failbit);
     }
     return in;
-}
+  }
 
-std::ostream& operator<<(std::ostream& out, const DataStruct& src)
-{
+  std::ostream & operator<<(std::ostream & out, const DataStruct & data)
+  {
     std::ostream::sentry sentry(out);
     if (!sentry)
     {
-        return out;
+      return out;
     }
-    iofmtguard fmtguard(out);
-    out << "(:key1 " << src.key1 << "ull:key2 0b";
-    if (src.key2 == 0)
+    out << "(:key1 " << data.key1 << "ull";
+    out << ":key2 0b";
+    if (data.key2 == 0)
     {
-        out << "0";
+      out << '0';
     }
     else
     {
-        std::string bin;
-        unsigned long long t = src.key2;
-        while (t > 0)
-        {
-            bin = ((t & 1) ? "1" : "0") + bin;
-            t >>= 1;
-        }
-        out << bin;
+      std::string bits;
+      unsigned long long val = data.key2;
+      while (val > 0)
+      {
+        bits = char('0' + (val & 1)) + bits;
+        val >>= 1;
+      }
+      out << bits;
     }
-    out << ":key3 \"" << src.key3 << "\":)";
+    out << ":key3 \"" << data.key3 << "\":)";
     return out;
-}
+  }
 
-bool compareDataStruct(const DataStruct& a, const DataStruct& b)
-{
-    if (a.key1 != b.key1)
+  bool DataStructComparator::operator()(const DataStruct & lhs, const DataStruct & rhs) const
+  {
+    if (lhs.key1 != rhs.key1)
     {
-        return a.key1 < b.key1;
+      return lhs.key1 < rhs.key1;
     }
-    if (a.key2 != b.key2)
+    if (lhs.key2 != rhs.key2)
     {
-        return a.key2 < b.key2;
+      return lhs.key2 < rhs.key2;
     }
-    return a.key3.length() < b.key3.length();
+    return lhs.key3.size() < rhs.key3.size();
+  }
 }
