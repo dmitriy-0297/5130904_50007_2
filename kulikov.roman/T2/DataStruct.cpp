@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <string>
-#include <stdexcept>
 
 namespace mashkin
 {
@@ -49,25 +48,17 @@ namespace mashkin
       }
       char c1 = '\0';
       char c2 = '\0';
-      in >> c1 >> c2;
-      if (!in)
-      {
-        return in;
-      }
-      bool isLower = (c1 == 'u' && c2 == 'l');
-      bool isUpper = (c1 == 'U' && c2 == 'L');
-      if (!isLower && !isUpper)
-      {
-        in.setstate(std::ios::failbit);
-        return in;
-      }
       char c3 = '\0';
-      in >> c3;
+      in.get(c1);
+      in.get(c2);
+      in.get(c3);
       if (!in)
       {
         return in;
       }
-      if (c3 != 'l' && c3 != 'L')
+      bool isLower = (c1 == 'u' && c2 == 'l' && c3 == 'l');
+      bool isUpper = (c1 == 'U' && c2 == 'L' && c3 == 'L');
+      if (!isLower && !isUpper)
       {
         in.setstate(std::ios::failbit);
         return in;
