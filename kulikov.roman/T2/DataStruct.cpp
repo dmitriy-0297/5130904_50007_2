@@ -107,6 +107,7 @@ std::istream& operator>>(std::istream& in, StringIO&& dest)
     {
         return in;
     }
+    // Skip whitespace before quote
     in >> std::skipws;
     char c = '0';
     in.get(c);
