@@ -16,7 +16,10 @@ namespace loginov
       if (!sentry) return in;
       char c = '\0';
       in >> c;
-      if (in && std::tolower(c) != std::tolower(dest.expected)) in.setstate(std::ios::failbit);
+      if (in && std::tolower(c) != std::tolower(dest.expected))
+      {
+        in.setstate(std::ios::failbit);
+      }
       return in;
     }
 
@@ -32,31 +35,27 @@ namespace loginov
       return in;
     }
 
-    struct HexUllIO { unsigned long long & value; };
-    std::istream & operator>>(std::istream & in, HexUllIO && dest)
-    {
-      std::istream::sentry sentry(in);
-      if (!sentry) return in;
-      return in >> std::hex >> dest.value >> std::dec;
-    }
-
-    struct ComplexIO { std::complex<double> & value; };
-    std::istream & operator>>(std::istream & in, ComplexIO && dest)
-    {
-      std::istream::sentry sentry(in);
-      if (!sentry) return in;
-      double re = 0.0, im = 0.0;
-      if (!(in >> LabelIO{"#c("} >> re >> im >> DelimiterIO{')'})) return in;
-      dest.value = {re, im};
-      return in;
-    }
-
     struct StringIO { std::string & value; };
     std::istream & operator>>(std::istream & in, StringIO && dest)
     {
       std::istream::sentry sentry(in);
       if (!sentry) return in;
       return in >> std::quoted(dest.value);
+    }
+
+    struct KeyIO { std::string & key; };
+    std::istream & operator>>(std::istream & in, KeyIO && dest)
+    {
+      std::istream::sentry sentry(in);
+      if (!sentry) return in;
+      dest.key.clear();
+      char c = '\0';
+      while (in >> c && c != ' ' && c != ':')
+      {
+        dest.key += c;
+      }
+      if (c == ':') in.putback(c);
+      return in;
     }
   }
 
@@ -70,20 +69,37 @@ namespace loginov
 
     for (int i = 0; i < 3; ++i)
     {
-      std::string key;
-      in >> std::ws;
-      std::getline(in, key, ' ');
+      std::string keyName;
+      in >> KeyIO{keyName};
 
-      if (key == "key1") in >> LabelIO{"0x"} >> HexUllIO{input.key1_};
-      else if (key == "key2") in >> ComplexIO{input.key2_};
-      else if (key == "key3") in >> StringIO{input.key3_};
-      else { in.setstate(std::ios::failbit); return in; }
+      if (keyName == "key1")
+      {
+        in >> LabelIO{"0x"} >> std::hex >> input.key1_ >> std::dec;
+      }
+      else if (keyName == "key2")
+      {
+        double re = 0.0, im = 0.0;
+        in >> LabelIO{"#c("} >> re >> im >> DelimiterIO{')'};
+        input.key2_ = {re, im};
+      }
+      else if (keyName == "key3")
+      {
+        in >> StringIO{input.key3_};
+      }
+      else
+      {
+        in.setstate(std::ios::failbit);
+      }
 
-      in >> DelimiterIO{':'};
+      if (!(in >> DelimiterIO{':'})) return in;
     }
 
     if (!(in >> DelimiterIO{')'})) return in;
-    if (in) data = input;
+
+    if (in)
+    {
+      data = input;
+    }
     return in;
   }
 
@@ -93,7 +109,7 @@ namespace loginov
     if (!sentry) return out;
     std::ios_base::fmtflags f(out.flags());
 
-    out << "(:key1 0x" << std::nouppercase << std::hex << data.key1_;
+    out << "(:key1 0x" << std::uppercase << std::hex << data.key1_ << std::nouppercase << std::dec;
     out << ":key2 #c(" << std::fixed << std::setprecision(1) << data.key2_.real() << " " << data.key2_.imag() << ")";
     out << ":key3 " << std::quoted(data.key3_) << ":)";
 
