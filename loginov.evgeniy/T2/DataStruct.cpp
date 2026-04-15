@@ -93,7 +93,7 @@ namespace loginov
     if (!sentry) return out;
     std::ios_base::fmtflags f(out.flags());
 
-    out << "(:key1 0x" << std::uppercase << std::hex << data.key1_ << std::dec;
+    out << "(:key1 0x" << std::nouppercase << std::hex << data.key1_;
     out << ":key2 #c(" << std::fixed << std::setprecision(1) << data.key2_.real() << " " << data.key2_.imag() << ")";
     out << ":key3 " << std::quoted(data.key3_) << ":)";
 
