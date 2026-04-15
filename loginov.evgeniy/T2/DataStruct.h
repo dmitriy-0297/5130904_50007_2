@@ -22,4 +22,5 @@ namespace loginov
     bool operator()(const DataStruct & lhs, const DataStruct & rhs) const;
   };
 }
+
 #endif

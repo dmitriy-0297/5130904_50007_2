@@ -10,8 +10,10 @@ int main()
   using namespace loginov;
   std::vector<DataStruct> data;
 
-  while (!std::cin.eof())
+  while (std::cin.good())
   {
+    if (std::cin.eof()) break;
+
     std::copy(
       std::istream_iterator<DataStruct>(std::cin),
       std::istream_iterator<DataStruct>(),

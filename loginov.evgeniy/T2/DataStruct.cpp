@@ -7,56 +7,19 @@
 
 namespace loginov
 {
-  namespace
+  struct DelimiterIO { char expected; };
+
+  std::istream & operator>>(std::istream & in, DelimiterIO && dest)
   {
-    struct DelimiterIO { char expected; };
-    std::istream & operator>>(std::istream & in, DelimiterIO && dest)
+    std::istream::sentry sentry(in);
+    if (!sentry) return in;
+    char c = '\0';
+    in >> c;
+    if (in && std::tolower(c) != std::tolower(dest.expected))
     {
-      std::istream::sentry sentry(in);
-      if (!sentry) return in;
-      char c = '\0';
-      in >> c;
-      if (in && std::tolower(c) != std::tolower(dest.expected))
-      {
-        in.setstate(std::ios::failbit);
-      }
-      return in;
+      in.setstate(std::ios::failbit);
     }
-
-    struct LabelIO { std::string expected; };
-    std::istream & operator>>(std::istream & in, LabelIO && dest)
-    {
-      std::istream::sentry sentry(in);
-      if (!sentry) return in;
-      for (char exp_c : dest.expected)
-      {
-        in >> DelimiterIO{exp_c};
-      }
-      return in;
-    }
-
-    struct StringIO { std::string & value; };
-    std::istream & operator>>(std::istream & in, StringIO && dest)
-    {
-      std::istream::sentry sentry(in);
-      if (!sentry) return in;
-      return in >> std::quoted(dest.value);
-    }
-
-    struct KeyIO { std::string & key; };
-    std::istream & operator>>(std::istream & in, KeyIO && dest)
-    {
-      std::istream::sentry sentry(in);
-      if (!sentry) return in;
-      dest.key.clear();
-      char c = '\0';
-      while (in >> c && c != ' ' && c != ':')
-      {
-        dest.key += c;
-      }
-      if (c == ':') in.putback(c);
-      return in;
-    }
+    return in;
   }
 
   std::istream & operator>>(std::istream & in, DataStruct & data)
@@ -64,42 +27,59 @@ namespace loginov
     std::istream::sentry sentry(in);
     if (!sentry) return in;
 
-    DataStruct input;
-    if (!(in >> LabelIO{"(:"})) return in;
+    DataStruct temp{0, {0.0, 0.0}, ""};
+    in >> DelimiterIO{'('} >> DelimiterIO{':'};
 
     for (int i = 0; i < 3; ++i)
     {
-      std::string keyName;
-      in >> KeyIO{keyName};
+      char k, e, y;
+      in >> k >> e >> y;
+      if (k != 'k' || e != 'e' || y != 'y')
+      {
+        in.setstate(std::ios::failbit);
+        return in;
+      }
 
-      if (keyName == "key1")
+      int keyNum = 0;
+      in >> keyNum;
+
+      if (keyNum == 1)
       {
-        in >> LabelIO{"0x"} >> std::hex >> input.key1_ >> std::dec;
+        char zero, x;
+        in >> zero >> x;
+        if (zero != '0' || std::tolower(x) != 'x')
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        in >> std::hex >> temp.key1_ >> std::dec;
       }
-      else if (keyName == "key2")
+      else if (keyNum == 2)
       {
+        char hash, c, openParen, closeParen;
         double re = 0.0, im = 0.0;
-        in >> LabelIO{"#c("} >> re >> im >> DelimiterIO{')'};
-        input.key2_ = {re, im};
+        in >> hash >> c >> openParen >> re >> im >> closeParen;
+        if (hash != '#' || std::tolower(c) != 'c' || openParen != '(' || closeParen != ')')
+        {
+          in.setstate(std::ios::failbit);
+          return in;
+        }
+        temp.key2_ = {re, im};
       }
-      else if (keyName == "key3")
+      else if (keyNum == 3)
       {
-        in >> StringIO{input.key3_};
+        in >> std::quoted(temp.key3_);
       }
       else
       {
         in.setstate(std::ios::failbit);
+        return in;
       }
-
-      if (!(in >> DelimiterIO{':'})) return in;
+      in >> DelimiterIO{':'};
     }
 
-    if (!(in >> DelimiterIO{')'})) return in;
-
-    if (in)
-    {
-      data = input;
-    }
+    in >> DelimiterIO{')'};
+    if (in) data = temp;
     return in;
   }
 
