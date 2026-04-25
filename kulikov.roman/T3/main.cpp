@@ -7,11 +7,13 @@
 #include <numeric>
 #include <iomanip>
 #include <cmath>
+#include <cctype>
 
 struct Point
 {
   int x, y;
 };
+
 struct Polygon
 {
   std::vector<Point> points;
@@ -20,34 +22,60 @@ struct Polygon
 std::istream & operator>>(std::istream & in, Point & p)
 {
   char c;
-  if (!(in >> c) || c != '(') { in.setstate(std::ios::failbit); return in; }
+  if (!(in >> c) || c != '(') { 
+    in.setstate(std::ios::failbit); 
+    return in; 
+  }
   if (!(in >> p.x)) return in;
-  if (!(in >> c) || c != ';') { in.setstate(std::ios::failbit); return in; }
+  if (!(in >> c) || c != ';') { 
+    in.setstate(std::ios::failbit); 
+    return in; 
+  }
   if (!(in >> p.y)) return in;
-  if (!(in >> c) || c != ')') { in.setstate(std::ios::failbit); return in; }
+  if (!(in >> c) || c != ')') { 
+    in.setstate(std::ios::failbit); 
+    return in; 
+  }
   return in;
 }
 
 std::istream & operator>>(std::istream & in, Polygon & poly)
 {
   int n = 0;
-  if (!(in >> n) || n < 3) { in.setstate(std::ios::failbit); return in; }
+  if (!(in >> n) || n < 3) { 
+    in.setstate(std::ios::failbit); 
+    return in; 
+  }
+
   std::vector<Point> pts(n);
-  for (auto & p : pts)
-    if (!(in >> p)) return in;
-  poly.points = pts;
+  for (int i = 0; i < n; ++i) {
+    if (!(in >> pts[i])) {
+      in.setstate(std::ios::failbit);
+      return in;
+    }
+  }
+
+  char c;
+  while (in.get(c)) {
+    if (!std::isspace(static_cast<unsigned char>(c))) {
+      in.putback(c);
+      break;
+    }
+  }
+
+  poly.points = std::move(pts);
   return in;
 }
 
 double area(const Polygon & poly)
 {
   const auto & pts = poly.points;
-  int n = pts.size();
-  int sum = 0;
+  int n = static_cast<int>(pts.size());
+  long long sum = 0; // используем long long для избежания переполнения
   for (int i = 0; i < n; i++)
   {
     int j = (i + 1) % n;
-    sum += pts[i].x * pts[j].y - pts[j].x * pts[i].y;
+    sum += static_cast<long long>(pts[i].x) * pts[j].y - static_cast<long long>(pts[j].x) * pts[i].y;
   }
   return std::abs(sum) / 2.0;
 }
@@ -55,7 +83,8 @@ double area(const Polygon & poly)
 bool isSame(const Polygon & a, const Polygon & b)
 {
   if (a.points.size() != b.points.size()) return false;
-  int n = a.points.size();
+  int n = static_cast<int>(a.points.size());
+  if (n == 0) return true;
 
   for (int start = 0; start < n; start++)
   {
@@ -127,8 +156,14 @@ void doArea(const std::vector<Polygon> & polys, const std::string & arg)
   else
   {
     int n = 0;
-    try { n = std::stoi(arg); } catch (...) { std::cout << "<INVALID COMMAND>\n"; return; }
-    if (n < 3) { std::cout << "<INVALID COMMAND>\n"; return; }
+    try { n = std::stoi(arg); } catch (...) { 
+      std::cout << "<INVALID COMMAND>\n"; 
+      return; 
+    }
+    if (n < 3) { 
+      std::cout << "<INVALID COMMAND>\n"; 
+      return; 
+    }
     double sum = 0;
     for (const auto & p : polys)
       if (static_cast<int>(p.points.size()) == n)
@@ -139,7 +174,10 @@ void doArea(const std::vector<Polygon> & polys, const std::string & arg)
 
 void doMax(const std::vector<Polygon> & polys, const std::string & arg)
 {
-  if (polys.empty()) { std::cout << "<INVALID COMMAND>\n"; return; }
+  if (polys.empty()) { 
+    std::cout << "<INVALID COMMAND>\n"; 
+    return; 
+  }
   if (arg == "AREA")
   {
     double mx = area(*std::max_element(polys.begin(), polys.end(),
@@ -153,12 +191,17 @@ void doMax(const std::vector<Polygon> & polys, const std::string & arg)
       { return a.points.size() < b.points.size(); })->points.size();
     std::cout << mx << "\n";
   }
-  else std::cout << "<INVALID COMMAND>\n";
+  else {
+    std::cout << "<INVALID COMMAND>\n";
+  }
 }
 
 void doMin(const std::vector<Polygon> & polys, const std::string & arg)
 {
-  if (polys.empty()) { std::cout << "<INVALID COMMAND>\n"; return; }
+  if (polys.empty()) { 
+    std::cout << "<INVALID COMMAND>\n"; 
+    return; 
+  }
   if (arg == "AREA")
   {
     double mn = area(*std::min_element(polys.begin(), polys.end(),
@@ -172,7 +215,9 @@ void doMin(const std::vector<Polygon> & polys, const std::string & arg)
       { return a.points.size() < b.points.size(); })->points.size();
     std::cout << mn << "\n";
   }
-  else std::cout << "<INVALID COMMAND>\n";
+  else {
+    std::cout << "<INVALID COMMAND>\n";
+  }
 }
 
 void doCount(const std::vector<Polygon> & polys, const std::string & arg)
@@ -192,8 +237,14 @@ void doCount(const std::vector<Polygon> & polys, const std::string & arg)
   else
   {
     int n = 0;
-    try { n = std::stoi(arg); } catch (...) { std::cout << "<INVALID COMMAND>\n"; return; }
-    if (n < 3) { std::cout << "<INVALID COMMAND>\n"; return; }
+    try { n = std::stoi(arg); } catch (...) { 
+      std::cout << "<INVALID COMMAND>\n"; 
+      return; 
+    }
+    if (n < 3) { 
+      std::cout << "<INVALID COMMAND>\n"; 
+      return; 
+    }
     int cnt = std::count_if(polys.begin(), polys.end(),
       [n](const Polygon & p) { return static_cast<int>(p.points.size()) == n; });
     std::cout << cnt << "\n";
@@ -204,7 +255,16 @@ void doLessArea(const std::vector<Polygon> & polys, const std::string & arg)
 {
   std::istringstream ss(arg);
   Polygon target;
-  if (!(ss >> target)) { std::cout << "<INVALID COMMAND>\n"; return; }
+  if (!(ss >> target)) { 
+    std::cout << "<INVALID COMMAND>\n"; 
+    return; 
+  }
+  std::ws(ss);
+  if (!ss.eof()) {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
+
   double targetArea = area(target);
   int cnt = std::count_if(polys.begin(), polys.end(),
     [targetArea](const Polygon & p) { return area(p) < targetArea; });
@@ -215,7 +275,16 @@ void doSame(const std::vector<Polygon> & polys, const std::string & arg)
 {
   std::istringstream ss(arg);
   Polygon target;
-  if (!(ss >> target)) { std::cout << "<INVALID COMMAND>\n"; return; }
+  if (!(ss >> target)) { 
+    std::cout << "<INVALID COMMAND>\n"; 
+    return; 
+  }
+  std::ws(ss);
+  if (!ss.eof()) {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
+
   int cnt = std::count_if(polys.begin(), polys.end(),
     [&target](const Polygon & p) { return isSame(p, target); });
   std::cout << cnt << "\n";
@@ -241,15 +310,21 @@ int main(int argc, char * argv[])
   while (std::getline(file, line))
   {
     if (line.empty()) continue;
+
     std::istringstream ss(line);
     Polygon poly;
-    if (ss >> poly)
-      polys.push_back(poly);
+    if (ss >> poly) {
+      std::ws(ss);
+      if (ss.eof()) {
+        polys.push_back(poly);
+      }
+    }
   }
 
   while (std::getline(std::cin, line))
   {
     if (line.empty()) continue;
+
     std::istringstream ss(line);
     std::string cmd;
     ss >> cmd;
@@ -263,28 +338,40 @@ int main(int argc, char * argv[])
     {
       std::string arg;
       std::istringstream as(rest);
-      if (!(as >> arg)) { std::cout << "<INVALID COMMAND>\n"; continue; }
+      if (!(as >> arg)) { 
+        std::cout << "<INVALID COMMAND>\n"; 
+        continue; 
+      }
       doArea(polys, arg);
     }
     else if (cmd == "MAX")
     {
       std::string arg;
       std::istringstream as(rest);
-      if (!(as >> arg)) { std::cout << "<INVALID COMMAND>\n"; continue; }
+      if (!(as >> arg)) { 
+        std::cout << "<INVALID COMMAND>\n"; 
+        continue; 
+      }
       doMax(polys, arg);
     }
     else if (cmd == "MIN")
     {
       std::string arg;
       std::istringstream as(rest);
-      if (!(as >> arg)) { std::cout << "<INVALID COMMAND>\n"; continue; }
+      if (!(as >> arg)) { 
+        std::cout << "<INVALID COMMAND>\n"; 
+        continue; 
+      }
       doMin(polys, arg);
     }
     else if (cmd == "COUNT")
     {
       std::string arg;
       std::istringstream as(rest);
-      if (!(as >> arg)) { std::cout << "<INVALID COMMAND>\n"; continue; }
+      if (!(as >> arg)) { 
+        std::cout << "<INVALID COMMAND>\n"; 
+        continue; 
+      }
       doCount(polys, arg);
     }
     else if (cmd == "LESSAREA")
