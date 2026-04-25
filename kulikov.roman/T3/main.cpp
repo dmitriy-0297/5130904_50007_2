@@ -131,7 +131,7 @@ void doArea(const std::vector<Polygon> & polys, const std::string & arg)
     if (n < 3) { std::cout << "<INVALID COMMAND>\n"; return; }
     double sum = 0;
     for (const auto & p : polys)
-      if ((int)p.points.size() == n)
+      if (static_cast<int>(p.points.size()) == n)
         sum += area(p);
     std::cout << std::fixed << std::setprecision(1) << sum << "\n";
   }
@@ -195,7 +195,7 @@ void doCount(const std::vector<Polygon> & polys, const std::string & arg)
     try { n = std::stoi(arg); } catch (...) { std::cout << "<INVALID COMMAND>\n"; return; }
     if (n < 3) { std::cout << "<INVALID COMMAND>\n"; return; }
     int cnt = std::count_if(polys.begin(), polys.end(),
-      [n](const Polygon & p) { return (int)p.points.size() == n; });
+      [n](const Polygon & p) { return static_cast<int>(p.points.size()) == n; });
     std::cout << cnt << "\n";
   }
 }
