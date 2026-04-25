@@ -349,6 +349,15 @@ void cmdEcho(std::vector< Polygon > & polygons, std::istream & in, std::ostream 
   Polygon target{};
   if (!(in >> target))
   {
+    in.clear();
+    std::string rest;
+    std::getline(in, rest);
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  std::string rest;
+  if (std::getline(in, rest) && !rest.empty() && rest.find_first_not_of(' ') != std::string::npos)
+  {
     out << "<INVALID COMMAND>\n";
     return;
   }
@@ -434,6 +443,7 @@ int main(int argc, char * argv[])
       std::getline(std::cin, rest);
       std::cout << "<INVALID COMMAND>\n";
     }
+    std::cin.clear();
   }
   return 0;
 }
