@@ -85,7 +85,12 @@ std::vector<Polygon> read_polygons(const std::string& filename)
     }
 
     if (ok && static_cast<int>(poly.points.size()) == n)
-      result.push_back(poly);
+    {
+      std::string extra;
+      iss >> extra;
+      if (extra.empty())
+        result.push_back(poly);
+    }
   }
 
   return result;
@@ -302,7 +307,9 @@ void process_commands(std::vector<Polygon>& polygons)
             return pt;
           });
 
-        if (!ok || static_cast<int>(target.points.size()) != n)
+        std::string extra;
+        iss >> extra;
+        if (!ok || static_cast<int>(target.points.size()) != n || !extra.empty())
         {
           std::cout << "<INVALID COMMAND>\n";
         }
@@ -340,7 +347,9 @@ void process_commands(std::vector<Polygon>& polygons)
             return pt;
           });
 
-        if (!ok || static_cast<int>(target.points.size()) != n)
+        std::string extra;
+        iss >> extra;
+        if (!ok || static_cast<int>(target.points.size()) != n || !extra.empty())
         {
           std::cout << "<INVALID COMMAND>\n";
         }
