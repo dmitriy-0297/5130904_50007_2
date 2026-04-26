@@ -47,7 +47,7 @@ std::vector<Polygon> read_polygons(const std::string& filename)
 
     std::istringstream iss(line);
     int n = 0;
-    if (!(iss >> n) || n <= 0)
+    if (!(iss >> n) || n < 3)
       continue;
 
     Polygon poly;
@@ -164,7 +164,7 @@ void process_commands(std::vector<Polygon>& polygons)
       else
       {
         int n = std::stoi(param);
-        if (n <= 0)
+        if (n < 3)
         {
           std::cout << "<INVALID COMMAND>\n";
         }
@@ -264,7 +264,7 @@ void process_commands(std::vector<Polygon>& polygons)
       else
       {
         int n = std::stoi(param);
-        if (n <= 0)
+        if (n < 3)
         {
           std::cout << "<INVALID COMMAND>\n";
         }
@@ -283,7 +283,7 @@ void process_commands(std::vector<Polygon>& polygons)
       Polygon target;
       int n = 0;
       iss >> n;
-      if (n <= 0)
+      if (n < 3)
       {
         std::cout << "<INVALID COMMAND>\n";
       }
@@ -321,7 +321,7 @@ void process_commands(std::vector<Polygon>& polygons)
       Polygon target;
       int n = 0;
       iss >> n;
-      if (n <= 0)
+      if (n < 3)
       {
         std::cout << "<INVALID COMMAND>\n";
       }

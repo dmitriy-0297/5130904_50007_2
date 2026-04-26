@@ -5,9 +5,9 @@
 
 int main(int argc, char* argv[])
 {
-  if (argc < 2)
+  if (argc != 2)
   {
-    std::cerr << "Error: no input file\n";
+    std::cerr << "Error: invalid number of arguments\n";
     return 1;
   }
 
