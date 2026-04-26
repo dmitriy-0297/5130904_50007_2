@@ -1,4 +1,4 @@
-x#ifndef SHAPES_HPP
+#ifndef SHAPES_HPP
 #define SHAPES_HPP
 
 #include <vector>
