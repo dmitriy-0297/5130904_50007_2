@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
 namespace polozhuk{
     struct Point {
         int x_;
@@ -34,6 +35,25 @@ namespace polozhuk{
 
         return in;
     }
+    std::istream& operator>>(std::istream& in, Polygon& poly) {
+        int n = 0;
+        if (!(in >> n)) {
+            return in;
+        }
+        if (n < 3) {
+            in.setstate(std::ios::failbit);
+            return in;
+        }
+        std::vector<Point> temp_points(n);
+        for (size_t i = 0; i < n; ++i) {
+            if (!(in >> temp_points[i])) {
+                return in;
+            }
+        }
+        poly.points_ = std::move(temp_points);
+        return in;
+    }
+
 
 
 
@@ -130,6 +150,6 @@ namespace polozhuk{
 
 
 
-int main() {
+int main(int argc, char* argv[]) {
 
 }
