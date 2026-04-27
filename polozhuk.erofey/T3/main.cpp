@@ -6,6 +6,9 @@ namespace polozhuk{
         int y_;
     };
 
+    struct Polygon {
+        std::vector<Point> points_;
+    };
 
 
 
