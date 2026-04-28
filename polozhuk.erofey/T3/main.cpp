@@ -60,6 +60,32 @@ namespace polozhuk{
         return in;
     }
 
+    bool operator==(const Point& lhs, const Point& rhs) {
+        if (lhs.x_ != rhs.x_ || lhs.y_ != rhs.y_) {
+            return false;
+        }
+        return true;
+    }
+    bool operator!=(const Point& lhs, const Point& rhs) {
+        return !(lhs == rhs);
+    }
+    bool operator<(const Point& lhs, const Point& rhs) { return lhs.x_ < rhs.x_ || lhs.y_ < rhs.y_; }
+    bool operator>(const Point& lhs, const Point& rhs) { return rhs < lhs; }
+    bool operator<(const Polygon& lhs, const Polygon& rhs) {
+        return lhs.points_ < rhs.points_;
+    }
+    bool operator>(const Polygon& lhs, const Polygon& rhs) {
+        return rhs < lhs;
+    }
+    bool operator==(const Polygon& lhs, const Polygon& rhs) {
+        if (lhs.points_ != rhs.points_) {
+            return false;
+        }
+        return true;
+    }
+    bool operator!=(const Polygon& lhs, const Polygon& rhs) {
+        return !(lhs == rhs);
+    }
 
 
     double getArea(const Polygon& polygon) {
