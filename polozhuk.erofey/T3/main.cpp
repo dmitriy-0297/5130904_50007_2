@@ -5,6 +5,8 @@
 #include <iterator>
 #include <numeric>
 #include <limits>
+#include <iomanip>
+#include <string>
 
 namespace polozhuk{
     struct Point {
@@ -122,6 +124,35 @@ namespace polozhuk{
     }
 
 
+    double doAccumulateNumOfVertexesArea(double res, size_t vertexes, const Polygon& polygons){
+        if (vertexes == polygons.points_.size())
+        {
+            res += getArea(polygons);
+        }
+        return res;
+    }
+    bool isEven(const Polygon& p){
+        return (p.points_.size() % 2 == 0);
+    }
+    double doAccumulateEvenArea(double res, const Polygon& p){
+        if (isEven(p))
+        {
+            res += getArea(p);
+        }
+        return res;
+    }
+    bool isOdd(const Polygon& p)
+    {
+        return !(p.points_.size() % 2 == 0);
+    }
+
+    double accumulateMaxArea(double res, const Polygon& p){
+        return std::max(res, getArea(p));
+    }
+
+    double accumulateMinArea(double res, const Polygon& p){
+        return std::min(res, getArea(p));
+    }
 
 
 
