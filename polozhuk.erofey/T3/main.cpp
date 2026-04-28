@@ -7,6 +7,8 @@
 #include <limits>
 #include <iomanip>
 #include <string>
+#include <cmath>
+#include <functional>
 
 namespace polozhuk{
     struct Point {
@@ -123,20 +125,11 @@ namespace polozhuk{
         in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
-
-    double doAccumulateNumOfVertexesArea(double res, size_t vertexes, const Polygon& polygons){
-        if (vertexes == polygons.points_.size())
-        {
-            res += getArea(polygons);
-        }
-        return res;
-    }
-    bool isEven(const Polygon& p){
-        return (p.points_.size() % 2 == 0);
+    bool isEven(const polozhuk::Polygon& p) {
+    return (p.points_.size() % 2 == 0);
     }
     double doAccumulateEvenArea(double res, const Polygon& p){
-        if (isEven(p))
-        {
+        if (isEven(p)){
             res += getArea(p);
         }
         return res;
@@ -154,7 +147,63 @@ namespace polozhuk{
         return std::min(res, getArea(p));
     }
 
-
+    void getAreaCmd(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
+        std::string line;
+        in >> line;
+        if (line == "EVEN") {
+            double count = std::accumulate(polygons.cbegin(), polygons.cend(), 0.0,
+                [](double insum, const polozhuk::Polygon& p) {
+                    if (isEven(p)) {
+                        return insum + polozhuk::getArea(p);
+                    }
+                     return insum;
+                }
+            );
+            out << count << "\n";
+        }
+        else if (line == "ODD") {
+            double count = std::accumulate(polygons.cbegin(), polygons.cend(), 0.0,
+                [](double insum, const polozhuk::Polygon& p) {
+                    if (!isEven(p)) {
+                        return insum + polozhuk::getArea(p);
+                    }
+                     return insum;
+                }
+            );
+            out << count << "\n";
+        }
+        else if (line == "MEAN") {
+            if (polygons.empty()) {
+                throw std::invalid_argument("<INVALID COMMAND>");
+            }
+            double bigSum = std::accumulate(polygons.cbegin(), polygons.cend(), 0.0,
+                [](double sum, const polozhuk::Polygon& p) {
+                    return sum + polozhuk::getArea(p);
+                }
+            );
+            out << bigSum / polygons.size() << "\n";
+        }
+        else {
+            size_t versh =  0;
+            try {
+                versh = std::stoull(line);
+            }
+            catch (const std::exception&) {
+                throw std::invalid_argument("<INVALID COMMAND>");
+            }
+            if (versh < 3 || polygons.empty()) {
+                throw std::invalid_argument("<INVALID COMMAND>");
+            }
+            double count = std::accumulate(polygons.cbegin(), polygons.cend(), 0.0,
+                [versh](double sum, const polozhuk::Polygon& p) {
+                    if (p.points_.size() ==  versh) {
+                        sum += polozhuk::getArea(p);
+                    }
+                    return sum;
+                });
+            out << count << "\n";
+        }
+    }
 
 
 
