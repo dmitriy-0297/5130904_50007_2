@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iterator>
 #include <numeric>
+#include <limits>
 
 namespace polozhuk{
     struct Point {
@@ -115,23 +116,10 @@ namespace polozhuk{
         return S ;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    void dvornik(std::istream& in) {
+        in.clear();
+        in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
 
 
 
@@ -161,25 +149,6 @@ namespace polozhuk{
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
