@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <iterator>
+#include <numeric>
 
 namespace polozhuk{
     struct Point {
@@ -53,12 +54,39 @@ namespace polozhuk{
         }
         std::vector<Point> tmp;
         std::copy_n((std::istream_iterator<Point>{in}), countPoints, std::back_inserter(tmp));
-
         if (in) {
             p.points_ = std::move(tmp);
         }
-
         return in;
+    }
+
+
+
+    double getArea(const Polygon& polygon) {
+        std::vector<double> rigtLeft;
+        std::vector<double> leftRight;
+        rigtLeft.reserve(polygon.points_.size());
+        leftRight.reserve(polygon.points_.size());
+        std::transform(
+        polygon.points_.cbegin(),
+        polygon.points_.cend() - 1,
+        polygon.points_.cbegin()+1,
+        std::back_inserter(rigtLeft),
+        [](const polozhuk::Point& p1, const polozhuk::Point& p2) {return p1.x_ * p2.y_;}
+        );
+        std::transform(
+        polygon.points_.cbegin(),
+        polygon.points_.cend() - 1,
+        polygon.points_.cbegin()+1,
+        std::back_inserter(leftRight),
+        [](const polozhuk::Point& p1, const polozhuk::Point& p2) {return p1.y_ * p2.x_;}
+        );
+        rigtLeft.push_back(polygon.points_[polygon.points_.size() - 1].x_ * polygon.points_[0].y_);
+        leftRight.push_back(polygon.points_[polygon.points_.size() - 1].y_ * polygon.points_[0].x_);
+        double sRL = std::accumulate(std::begin(rigtLeft), std::end(rigtLeft), 0.0);
+        double sLR = std::accumulate(std::begin(leftRight), std::end(leftRight), 0.0);
+        double S = std::abs(sLR - sRL) * 0.5;
+        return S ;
     }
 
 
