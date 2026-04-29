@@ -179,7 +179,7 @@ namespace polozhuk{
             try {
                 versh = std::stoull(line);
             }
-            catch (const std::exception&) {
+            catch (...) {
                 throw std::invalid_argument("<INVALID COMMAND>");
             }
             if (versh < 3) {
@@ -218,13 +218,14 @@ namespace polozhuk{
         std::string line;
         in >> line;
         using namespace std::placeholders;
-        size_t maxSize = std::numeric_limits< size_t >::max();
+
         if (line == "AREA") {
-            out << std::accumulate(polygons.cbegin(), polygons.cend(), maxSize, accumulateMinArea);
+            double maxDouble = std::numeric_limits< double >::max();
+            out << std::accumulate(polygons.cbegin(), polygons.cend(), maxDouble, accumulateMinArea) << '\n';
         }
-        else if (line == "VERTEXES")
-        {
-            out << std::accumulate(polygons.cbegin(), polygons.cend(), maxSize, accumulateMinVertexes);
+        else if (line == "VERTEXES"){
+            size_t maxSize = std::numeric_limits< size_t >::max();
+            out << std::accumulate(polygons.cbegin(), polygons.cend(), maxSize, accumulateMinVertexes) << '\n';
         }
         else
         {
@@ -249,6 +250,41 @@ namespace polozhuk{
         else
         {
             throw std::invalid_argument("<INVALID COMMAND>");
+        }
+    }
+
+    void getCountCmd(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
+        out << std::setprecision(1) << std::fixed;
+        std::string line;
+        in >> line;
+        using namespace std::placeholders;
+        if (line == "EVEN") {
+            size_t count = std::count_if(polygons.cbegin(), polygons.cend(), isEven);
+            out << count << "\n";
+        }
+        else if (line == "ODD") {
+            size_t count = std::count_if(polygons.cbegin(), polygons.cend(), isOdd);
+            out << count << "\n";
+        }
+        else {
+            size_t versh = 0;
+            try {
+                versh = std::stoull(line);
+            }
+            catch (...) {
+                throw std::invalid_argument("<INVALID COMMAND>");
+            }
+            if (versh < 3) {
+                throw std::invalid_argument("<INVALID COMMAND>");
+            }
+            size_t getCount = std::accumulate(polygons.cbegin(), polygons.cend(), 0,
+                [versh](size_t count, const polozhuk::Polygon& p) {
+                    if (p.points_.size() == versh) {
+                        ++count;
+                    }
+                    return count;
+                });
+            out << getCount << "\n";
         }
     }
 
