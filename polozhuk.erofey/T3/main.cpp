@@ -231,6 +231,27 @@ namespace polozhuk{
             throw std::invalid_argument("<INVALID COMMAND>");
         }
     }
+    void getMaxCmd(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
+        if (polygons.empty()) {
+            throw std::invalid_argument("<INVALID COMMAND>");
+        }
+        out << std::setprecision(1) << std::fixed;
+        std::string line;
+        in >> line;
+        using namespace std::placeholders;
+        if (line == "AREA") {
+            out << std::accumulate(polygons.cbegin(), polygons.cend(), 0.0, accumulateMaxArea);
+        }
+        else if (line == "VERTEXES")
+        {
+            out << std::accumulate(polygons.cbegin(), polygons.cend(), 0.0, accumulateMaxVertexes);
+        }
+        else
+        {
+            throw std::invalid_argument("<INVALID COMMAND>");
+        }
+    }
+
 
 
 
