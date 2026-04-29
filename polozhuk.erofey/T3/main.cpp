@@ -210,7 +210,7 @@ namespace polozhuk{
         return std::max(size, p.points_.size());
 
     }
-    void getMin(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
+    void getMinCmd(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         if (polygons.empty()) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
@@ -218,8 +218,17 @@ namespace polozhuk{
         std::string line;
         in >> line;
         using namespace std::placeholders;
+        size_t maxSize = std::numeric_limits< size_t >::max();
         if (line == "AREA") {
-
+            out << std::accumulate(polygons.cbegin(), polygons.cend(), maxSize, accumulateMinArea);
+        }
+        else if (line == "VERTEXES")
+        {
+            out << std::accumulate(polygons.cbegin(), polygons.cend(), maxSize, accumulateMinVertexes);
+        }
+        else
+        {
+            throw std::invalid_argument("<INVALID COMMAND>");
         }
     }
 
