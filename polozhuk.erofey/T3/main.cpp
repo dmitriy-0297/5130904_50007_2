@@ -288,7 +288,7 @@ namespace polozhuk{
         }
     }
     void getMaxSeqCmd(const std::vector<polozhuk::Polygon>& polygons, std::istream& in, std::ostream& out) {
-        polozhuk::Polygon cmd;
+        Polygon cmd;
         if (!(in >> cmd) || cmd.points_.size() < 3) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
@@ -313,6 +313,36 @@ namespace polozhuk{
         out << accum << "\n";
     }
 
+    std::ostream& operator<<(std::ostream& out, const Point& pt) {
+        out << "(" << pt.x_ << ";" << pt.y_ << ")";
+        return out;
+    }
+    std::ostream& operator<<(std::ostream& out, const Polygon& poly) {
+        out << poly.points_.size() << " ";
+        std::copy(
+            poly.points_.cbegin(),
+            poly.points_.cend(),
+            std::ostream_iterator<Point>(out, " ")
+        );
+        return out;
+    }
+    void repeat(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
+        size_t vertex = 0;
+        if (!(in >> vertex) || vertex < 3) {
+            throw std::invalid_argument("<INVALID COMMAND>");
+        }
+        size_t added_count = std::accumulate(polygons.cbegin(), polygons.cend(), 0ull,
+            [&out, vertex](size_t count, const Polygon& p) {
+                if (p.points_.size() == vertex) {
+                    out << p << " ";
+                    return count + 1;
+                }
+                return count;
+            }
+        );
+
+        out << "\n" << added_count << "\n";
+    }
 
 
 
@@ -372,13 +402,12 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error: No input file provided.\n";
         return 1;
     }
-    std::string filename = argv[1];
-    std::ifstream inputFile(filename);
-
+    std::ifstream inputFile(argv[1]);
     if (!inputFile.is_open()) {
-        std::cerr << "Error: Could not open file " << filename << "\n";
+        std::cerr << "Error: Could not open file\n";
         return 1;
     }
+
 
     std::vector<polozhuk::Polygon> polygons;
     polozhuk::Polygon tempPoly;
