@@ -138,15 +138,6 @@ namespace polozhuk{
     {
         return !(p.points_.size() % 2 == 0);
     }
-
-    double accumulateMaxArea(double res, const Polygon& p){
-        return std::max(res, getArea(p));
-    }
-
-    double accumulateMinArea(double res, const Polygon& p){
-        return std::min(res, getArea(p));
-    }
-
     void getAreaCmd(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
         std::string line;
         in >> line;
@@ -191,7 +182,7 @@ namespace polozhuk{
             catch (const std::exception&) {
                 throw std::invalid_argument("<INVALID COMMAND>");
             }
-            if (versh < 3 || polygons.empty()) {
+            if (versh < 3) {
                 throw std::invalid_argument("<INVALID COMMAND>");
             }
             double count = std::accumulate(polygons.cbegin(), polygons.cend(), 0.0,
@@ -205,6 +196,32 @@ namespace polozhuk{
         }
     }
 
+
+    double accumulateMaxArea(double res, const Polygon& p){
+        return std::max(res, getArea(p));
+    }
+    double accumulateMinArea(double res, const Polygon& p){
+        return std::min(res, getArea(p));
+    }
+    size_t accumulateMinVertexes(size_t size, const Polygon& p){
+        return std::min(size, p.points_.size());
+    }
+    size_t accumulateMaxVertexes(size_t size, const Polygon& p){
+        return std::max(size, p.points_.size());
+
+    }
+    void getMin(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
+        if (polygons.empty()) {
+            throw std::invalid_argument("<INVALID COMMAND>");
+        }
+        out << std::setprecision(1) << std::fixed;
+        std::string line;
+        in >> line;
+        using namespace std::placeholders;
+        if (line == "AREA") {
+
+        }
+    }
 
 
 
@@ -281,6 +298,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Successfully read " << polygons.size() << " polygons.\n";
     return 0;
 }
+
 
 
 
