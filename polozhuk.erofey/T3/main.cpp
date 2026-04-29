@@ -287,7 +287,31 @@ namespace polozhuk{
             out << getCount << "\n";
         }
     }
-
+    void getMaxSeqCmd(const std::vector<polozhuk::Polygon>& polygons, std::istream& in, std::ostream& out) {
+        polozhuk::Polygon cmd;
+        if (!(in >> cmd) || cmd.points_.size() < 3) {
+            throw std::invalid_argument("<INVALID COMMAND>");
+        }
+        if (polygons.empty()) {
+            out << "0\n";
+            return;
+        }
+        size_t cur_seq = 0;
+        auto accum = std::accumulate(polygons.cbegin(), polygons.cend(), 0ull,
+            [&cmd, &cur_seq](size_t max_seq, const polozhuk::Polygon& p) {
+                if (p.points_ == cmd.points_) {
+                    ++cur_seq;
+                    if (cur_seq > max_seq) {
+                        max_seq = cur_seq;
+                    }
+                }
+                else {
+                    cur_seq = 0;
+                }
+                return max_seq;
+            });
+        out << accum << "\n";
+    }
 
 
 
