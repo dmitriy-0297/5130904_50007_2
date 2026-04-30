@@ -382,6 +382,7 @@ int main(int argc, char* argv[]) {
     while (std::cin >> cmd) {
         try {
             mymap::mapCmd.at(cmd)(polygon, std::cin, std::cout);
+            std::cout<< "\n";
         }
         catch (const std::out_of_range&) {
             std::cerr << "<INVALID COMMAND>\n";
@@ -391,6 +392,9 @@ int main(int argc, char* argv[]) {
             std::cerr << e.what() << "\n";
             polozhuk::dvornik(std::cin);
         }
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+
     }
     return 0;
 }
