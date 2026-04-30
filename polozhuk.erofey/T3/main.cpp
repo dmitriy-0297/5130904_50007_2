@@ -344,9 +344,21 @@ namespace polozhuk{
 
         out << "\n" << added_count << "\n";
     }
-}
+};
 
+namespace mymap {
+    std::map<std::string,std::
+    function<void(const std::vector<polozhuk::Polygon>&, std::istream&, std::ostream&)>> mapCmd{
+        {"AREA", polozhuk::getAreaCmd},
+        {"ECHO", polozhuk::repeat},
+        {"MASXEQ", polozhuk::getMaxSeqCmd},
+        {"COUNT", polozhuk::getCountCmd},
+        {"MIN", polozhuk::getMinCmd},
+        {"MAX", polozhuk::getMaxCmd}
+    };
+}
 int main(int argc, char* argv[]) {
+
     if (argc < 2) {
         std::cerr << "Error: No input file provided.\n";
         return 1;
@@ -356,6 +368,7 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error: Could not open file\n";
         return 1;
     }
+    std::cout << std::setprecision(1) << std::fixed;
     std::vector<polozhuk::Polygon> polygon;
     polozhuk::Polygon line;
     while (inputFile>>line) {
@@ -365,20 +378,10 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error: File format is invalid.\n";
         return 1;
     }
-
-    std::map<std::string,std::
-    function<void(const std::vector<polozhuk::Polygon>&, std::istream&, std::ostream&)>> mapCmd{
-    {"AREA", polozhuk::getAreaCmd},
-    {"ECHO", polozhuk::repeat},
-    {"MASXEQ", polozhuk::getMaxSeqCmd},
-    {"COUNT", polozhuk::getCountCmd},
-    {"MIN", polozhuk::getMinCmd},
-    {"MAX", polozhuk::getMaxCmd}
-    };
     std::string cmd ;
     while (std::cin >> cmd) {
         try {
-            mapCmd.at(cmd)(polygon, std::cin, std::cout);
+            mymap::mapCmd.at(cmd)(polygon, std::cin, std::cout);
         }
         catch (const std::out_of_range&) {
             std::cerr << "<INVALID COMMAND>\n";
@@ -389,13 +392,5 @@ int main(int argc, char* argv[]) {
             polozhuk::dvornik(std::cin);
         }
     }
-
-
     return 0;
 }
-
-
-
-
-
-
