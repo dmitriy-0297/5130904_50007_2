@@ -9,6 +9,7 @@
 #include <string>
 #include <cmath>
 #include <functional>
+#include <map>
 
 namespace polozhuk{
     struct Point {
@@ -334,7 +335,7 @@ namespace polozhuk{
         size_t added_count = std::accumulate(polygons.cbegin(), polygons.cend(), 0ull,
             [&out, vertex](size_t count, const Polygon& p) {
                 if (p.points_.size() == vertex) {
-                    out << p << " ";
+                    out << p << "\n";
                     return count + 1;
                 }
                 return count;
@@ -343,59 +344,7 @@ namespace polozhuk{
 
         out << "\n" << added_count << "\n";
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -407,14 +356,41 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error: Could not open file\n";
         return 1;
     }
-
-
-    std::vector<polozhuk::Polygon> polygons;
-    polozhuk::Polygon tempPoly;
-    while (inputFile >> tempPoly) {
-        polygons.push_back(tempPoly);
+    std::vector<polozhuk::Polygon> polygon;
+    polozhuk::Polygon line;
+    while (inputFile>>line) {
+        polygon.push_back(line);
     }
-    std::cout << "Successfully read " << polygons.size() << " polygons.\n";
+    if (!inputFile.eof() && inputFile.fail()) {
+        std::cerr << "Error: File format is invalid.\n";
+        return 1;
+    }
+
+    std::map<std::string,std::
+    function<void(const std::vector<polozhuk::Polygon>&, std::istream&, std::ostream&)>> mapCmd{
+    {"AREA", polozhuk::getAreaCmd},
+    {"ECHO", polozhuk::repeat},
+    {"MASXEQ", polozhuk::getMaxSeqCmd},
+    {"COUNT", polozhuk::getCountCmd},
+    {"MIN", polozhuk::getMinCmd},
+    {"MAX", polozhuk::getMaxCmd}
+    };
+    std::string cmd ;
+    while (std::cin >> cmd) {
+        try {
+            mapCmd.at(cmd)(polygon, std::cin, std::cout);
+        }
+        catch (const std::out_of_range&) {
+            std::cerr << "<INVALID COMMAND>\n";
+            polozhuk::dvornik(std::cin);
+        }
+        catch (const std::invalid_argument& e) {
+            std::cerr << e.what() << "\n";
+            polozhuk::dvornik(std::cin);
+        }
+    }
+
+
     return 0;
 }
 
