@@ -327,31 +327,31 @@ namespace polozhuk{
         );
         return out;
     }
-    void repeat(const std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
-        size_t vertex = 0;
-        if (!(in >> vertex) || vertex < 3) {
+    void repeat(std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
+        Polygon cmd;
+        if (!(in >> cmd) || cmd.points_.size() < 3) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
-        size_t added_count = std::accumulate(polygons.cbegin(), polygons.cend(), 0ull,
-            [&out, vertex](size_t count, const Polygon& p) {
-                if (p.points_.size() == vertex) {
-                    out << p << "\n";
-                    return count + 1;
+        size_t count = std::count(polygons.cbegin(), polygons.cend(), cmd);
+        std::vector<Polygon> new_polygons;
+        std::for_each(polygons.cbegin(), polygons.cend(),
+            [&new_polygons, &cmd](const Polygon& p) {
+                new_polygons.push_back(p);
+                if (p == cmd) {
+                    new_polygons.push_back(p);
                 }
-                return count;
-            }
-        );
-
-        out << "\n" << added_count << "\n";
+                return new_polygons;
+            });
+        polygons = std::move(new_polygons);
     }
 };
 
 namespace mymap {
     std::map<std::string,std::
-    function<void(const std::vector<polozhuk::Polygon>&, std::istream&, std::ostream&)>> mapCmd{
+    function<void(std::vector<polozhuk::Polygon>&, std::istream&, std::ostream&)>> mapCmd{
         {"AREA", polozhuk::getAreaCmd},
         {"ECHO", polozhuk::repeat},
-        {"MASXEQ", polozhuk::getMaxSeqCmd},
+        {"MAXSEQ", polozhuk::getMaxSeqCmd},
         {"COUNT", polozhuk::getCountCmd},
         {"MIN", polozhuk::getMinCmd},
         {"MAX", polozhuk::getMaxCmd}
@@ -382,7 +382,7 @@ int main(int argc, char* argv[]) {
     while (std::cin >> cmd) {
         try {
             mymap::mapCmd.at(cmd)(polygon, std::cin, std::cout);
-            std::cout<< "\n";
+
         }
         catch (const std::out_of_range&) {
             std::cerr << "<INVALID COMMAND>\n";
@@ -392,8 +392,6 @@ int main(int argc, char* argv[]) {
             std::cerr << e.what() << "\n";
             polozhuk::dvornik(std::cin);
         }
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
 
     }
     return 0;
