@@ -387,13 +387,6 @@ int main(int argc, char* argv[]) {
     std::cout << std::setprecision(1) << std::fixed;
     std::vector<polozhuk::Polygon> polygon;
     polozhuk::Polygon line;
-    while (inputFile>>line) {
-        polygon.push_back(line);
-    }
-    if (!inputFile.eof() && inputFile.fail()) {
-        std::cerr << "Error: File format is invalid.\n";
-        return 1;
-    }
     while (!inputFile.eof()) {
         if (inputFile >> line) {
             polygon.push_back(line);
