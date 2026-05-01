@@ -293,6 +293,12 @@ namespace polozhuk{
         if (!(in >> cmd) || cmd.points_.size() < 3) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
+        char c;
+        while (in.get(c) && c != '\n') {
+            if (!std::isspace(c)) {
+                throw std::invalid_argument("<INVALID COMMAND>");
+            }
+        }
         if (polygons.empty()) {
             out << "0\n";
             return;
@@ -328,23 +334,28 @@ namespace polozhuk{
         return out;
     }
     void repeat(std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
-        Polygon cmd;
-        if (!(in >> cmd) || cmd.points_.size() < 3) {
+        Polygon target;
+        if (!(in >> target) || target.points_.size() < 3) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
-
-        size_t count = std::count(polygons.cbegin(), polygons.cend(), cmd);
+        char c;
+        while (in.get(c) && c != '\n') {
+            if (!std::isspace(c)) {
+                throw std::invalid_argument("<INVALID COMMAND>");
+            }
+        }
+        size_t count = std::count(polygons.cbegin(), polygons.cend(), target);
         if (count > 0) {
             std::vector<Polygon> new_polygons;
             new_polygons.reserve(polygons.size() + count);
             std::for_each(polygons.cbegin(), polygons.cend(),
-                [&new_polygons, &cmd](const Polygon& p) {
+                [&new_polygons, &target](const Polygon& p) {
                     new_polygons.push_back(p);
-                    if (p == cmd) {
+                    if (p == target) {
                         new_polygons.push_back(p);
                     }
-                    return new_polygons;
-                });
+                }
+            );
             polygons = std::move(new_polygons);
         }
         out << count << "\n";
