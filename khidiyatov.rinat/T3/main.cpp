@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <cmath>
 #include <map>
+#include <cctype>
 
 struct Point
 {
@@ -60,14 +61,16 @@ std::istream& operator>>(std::istream& in, Polygon& polygon)
         in.setstate(std::ios::failbit);
         return in;
     }
-    std::generate_n(std::back_inserter(polygon.points), count, [&in]() {
-        Point p{};
-        in >> p;
-        return p;
-        });
-    if (!in)
+    for (size_t i = 0; i < count; ++i)
     {
-        polygon.points.clear();
+        Point p;
+        if (!(in >> p))
+        {
+            in.setstate(std::ios::failbit);
+            polygon.points.clear();
+            return in;
+        }
+        polygon.points.push_back(p);
     }
     return in;
 }
@@ -82,14 +85,14 @@ void discardInvalidCommand(std::istream& in, std::ostream& out)
 
 double computeArea(const Polygon& polygon)
 {
-    std::vector<size_t> idx(polygon.points.size());
-    std::iota(idx.begin(), idx.end(), 0);
-
-    double area = std::accumulate(idx.cbegin(), idx.cend(), 0.0, [&](double sum, size_t i) {
+    double area = 0.0;
+    size_t n = polygon.points.size();
+    for (size_t i = 0; i < n; ++i)
+    {
         const Point& p1 = polygon.points[i];
-        const Point& p2 = polygon.points[(i + 1) % polygon.points.size()];
-        return sum + (static_cast<double>(p1.x) * p2.y - static_cast<double>(p2.x) * p1.y);
-        });
+        const Point& p2 = polygon.points[(i + 1) % n];
+        area += (static_cast<double>(p1.x) * p2.y - static_cast<double>(p2.x) * p1.y);
+    }
     return std::abs(area) / 2.0;
 }
 
@@ -128,41 +131,47 @@ bool doIntersect(const Point& p1, const Point& q1, const Point& p2, const Point&
 
 bool isPointInside(const Polygon& poly, const Point& pt)
 {
-    std::vector<size_t> idx(poly.points.size());
-    std::iota(idx.begin(), idx.end(), 0);
+    size_t crossings = 0;
+    size_t n = poly.points.size();
+    for (size_t i = 0; i < n; ++i)
+    {
+        const Point& p1 = poly.points[i];
+        const Point& p2 = poly.points[(i + 1) % n];
 
-    size_t crossings = std::count_if(idx.cbegin(), idx.cend(), [&](size_t i) {
-        Point p1 = poly.points[i];
-        Point p2 = poly.points[(i + 1) % poly.points.size()];
         bool cond1 = (p1.y > pt.y) != (p2.y > pt.y);
-        if (!cond1) return false;
+        if (!cond1) continue;
+
         double intersectX = static_cast<double>(p2.x - p1.x) * (pt.y - p1.y) / (p2.y - p1.y) + p1.x;
-        return static_cast<double>(pt.x) < intersectX;
-        });
+        if (static_cast<double>(pt.x) < intersectX)
+        {
+            ++crossings;
+        }
+    }
     return crossings % 2 != 0;
 }
 
 bool polygonsIntersectEdges(const Polygon& poly1, const Polygon& poly2)
 {
-    std::vector<size_t> idx1(poly1.points.size());
-    std::iota(idx1.begin(), idx1.end(), 0);
-    std::vector<size_t> idx2(poly2.points.size());
-    std::iota(idx2.begin(), idx2.end(), 0);
+    size_t n1 = poly1.points.size();
+    size_t n2 = poly2.points.size();
 
-    return std::any_of(idx1.cbegin(), idx1.cend(), [&](size_t i) {
+    for (size_t i = 0; i < n1; ++i)
+    {
         Point p1 = poly1.points[i];
-        Point q1 = poly1.points[(i + 1) % poly1.points.size()];
-        return std::any_of(idx2.cbegin(), idx2.cend(), [&](size_t j) {
+        Point q1 = poly1.points[(i + 1) % n1];
+        for (size_t j = 0; j < n2; ++j)
+        {
             Point p2 = poly2.points[j];
-            Point q2 = poly2.points[(j + 1) % poly2.points.size()];
-            return doIntersect(p1, q1, p2, q2);
-            });
-        });
+            Point q2 = poly2.points[(j + 1) % n2];
+            if (doIntersect(p1, q1, p2, q2)) return true;
+        }
+    }
+    return false;
 }
 
-bool polygonFullyInside(const Polygon& poly1, const Polygon& poly2)
+bool isPolygonInside(const Polygon& poly1, const Polygon& poly2)
 {
-    return std::any_of(poly1.points.cbegin(), poly1.points.cend(), [&](const Point& pt) {
+    return std::all_of(poly1.points.cbegin(), poly1.points.cend(), [&](const Point& pt) {
         return isPointInside(poly2, pt);
         });
 }
@@ -170,8 +179,8 @@ bool polygonFullyInside(const Polygon& poly1, const Polygon& poly2)
 bool polygonsIntersect(const Polygon& p1, const Polygon& p2)
 {
     if (polygonsIntersectEdges(p1, p2)) return true;
-    if (polygonFullyInside(p1, p2)) return true;
-    if (polygonFullyInside(p2, p1)) return true;
+    if (isPolygonInside(p1, p2)) return true;
+    if (isPolygonInside(p2, p1)) return true;
     return false;
 }
 
@@ -198,7 +207,7 @@ void cmdArea(std::vector<Polygon>& polygons, std::istream& in, std::ostream& out
             }) / polygons.size() << "\n";
     }
     else {
-        if (param.empty() || !std::all_of(param.cbegin(), param.cend(), ::isdigit)) {
+        if (param.empty() || !std::all_of(param.cbegin(), param.cend(), [](unsigned char c) { return std::isdigit(c); })) {
             discardInvalidCommand(in, out); return;
         }
         size_t vertexCount = std::stoull(param);
@@ -265,7 +274,7 @@ void cmdCount(std::vector<Polygon>& polygons, std::istream& in, std::ostream& ou
         out << std::count_if(polygons.cbegin(), polygons.cend(), isOdd) << "\n";
     }
     else {
-        if (param.empty() || !std::all_of(param.cbegin(), param.cend(), ::isdigit)) {
+        if (param.empty() || !std::all_of(param.cbegin(), param.cend(), [](unsigned char c) { return std::isdigit(c); })) {
             discardInvalidCommand(in, out); return;
         }
         size_t vertexCount = std::stoull(param);
@@ -283,8 +292,8 @@ void cmdRmEcho(std::vector<Polygon>& polygons, std::istream& in, std::ostream& o
         discardInvalidCommand(in, out);
         return;
     }
-    auto newEnd = std::unique(polygons.begin(), polygons.end(), [&](const Polygon& a, const Polygon& b) {
-        return a == target && b == target;
+    auto newEnd = std::remove_if(polygons.begin(), polygons.end(), [&](const Polygon& p) {
+        return p == target;
         });
     out << std::distance(newEnd, polygons.end()) << "\n";
     polygons.erase(newEnd, polygons.end());
