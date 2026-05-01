@@ -394,6 +394,17 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error: File format is invalid.\n";
         return 1;
     }
+    while (!inputFile.eof()) {
+        if (inputFile >> line) {
+            polygon.push_back(line);
+        }
+        else {
+            if (inputFile.eof()) {
+                break;
+            }
+            polozhuk::dvornik(inputFile);
+        }
+    }
     std::string cmd ;
     while (std::cin >> cmd) {
         try {
