@@ -52,11 +52,8 @@ std::istream& operator>>(std::istream& in, Polygon& polygon) {
     return in;
 }
 
-void discardInvalidCommand(std::istream& in, std::ostream& out) {
+void discardInvalidCommand(std::ostream& out) {
     out << "<INVALID COMMAND>\n";
-    in.clear();
-    std::string discard;
-    std::getline(in, discard);
 }
 
 bool checkLineEnd(std::istream& in) {
@@ -89,7 +86,7 @@ long long getOrientation(const Point& p, const Point& q, const Point& r) {
 
 bool onSegment(const Point& p, const Point& q, const Point& r) {
     return q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
-        q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y);
+        q.y <= std::max(p.y, r.y) && q.y <= std::min(p.y, r.y);
 }
 
 bool doIntersect(const Point& p1, const Point& q1, const Point& p2, const Point& q2) {
@@ -146,7 +143,7 @@ bool polygonsIntersect(const Polygon& p1, const Polygon& p2) {
 
 void cmdArea(std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
     std::string param;
-    if (!(in >> param) || !checkLineEnd(in)) { discardInvalidCommand(in, out); return; }
+    if (!(in >> param) || !checkLineEnd(in)) { discardInvalidCommand(out); return; }
     out << std::fixed << std::setprecision(1);
 
     if (param == "EVEN") {
@@ -158,16 +155,16 @@ void cmdArea(std::vector<Polygon>& polygons, std::istream& in, std::ostream& out
             return isOdd(p) ? s + computeArea(p) : s; }) << "\n";
     }
     else if (param == "MEAN") {
-        if (polygons.empty()) { discardInvalidCommand(in, out); return; }
+        if (polygons.empty()) { discardInvalidCommand(out); return; }
         out << std::accumulate(polygons.cbegin(), polygons.cend(), 0.0, [](double s, const Polygon& p) {
             return s + computeArea(p); }) / polygons.size() << "\n";
     }
     else {
         if (param.empty() || !std::all_of(param.cbegin(), param.cend(), [](unsigned char c) { return std::isdigit(c); })) {
-            discardInvalidCommand(in, out); return;
+            discardInvalidCommand(out); return;
         }
         size_t v = std::stoull(param);
-        if (v < 3) { discardInvalidCommand(in, out); return; }
+        if (v < 3) { discardInvalidCommand(out); return; }
         out << std::accumulate(polygons.cbegin(), polygons.cend(), 0.0, [v](double s, const Polygon& p) {
             return hasNVertexes(p, v) ? s + computeArea(p) : s; }) << "\n";
     }
@@ -175,7 +172,7 @@ void cmdArea(std::vector<Polygon>& polygons, std::istream& in, std::ostream& out
 
 void cmdMax(std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
     std::string param;
-    if (!(in >> param) || polygons.empty() || !checkLineEnd(in)) { discardInvalidCommand(in, out); return; }
+    if (!(in >> param) || polygons.empty() || !checkLineEnd(in)) { discardInvalidCommand(out); return; }
 
     if (param == "AREA") {
         auto it = std::max_element(polygons.cbegin(), polygons.cend(), [](const Polygon& a, const Polygon& b) {
@@ -188,13 +185,13 @@ void cmdMax(std::vector<Polygon>& polygons, std::istream& in, std::ostream& out)
         out << it->points.size() << "\n";
     }
     else {
-        discardInvalidCommand(in, out);
+        discardInvalidCommand(out);
     }
 }
 
 void cmdMin(std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
     std::string param;
-    if (!(in >> param) || polygons.empty() || !checkLineEnd(in)) { discardInvalidCommand(in, out); return; }
+    if (!(in >> param) || polygons.empty() || !checkLineEnd(in)) { discardInvalidCommand(out); return; }
 
     if (param == "AREA") {
         auto it = std::min_element(polygons.cbegin(), polygons.cend(), [](const Polygon& a, const Polygon& b) {
@@ -207,13 +204,13 @@ void cmdMin(std::vector<Polygon>& polygons, std::istream& in, std::ostream& out)
         out << it->points.size() << "\n";
     }
     else {
-        discardInvalidCommand(in, out);
+        discardInvalidCommand(out);
     }
 }
 
 void cmdCount(std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
     std::string param;
-    if (!(in >> param) || !checkLineEnd(in)) { discardInvalidCommand(in, out); return; }
+    if (!(in >> param) || !checkLineEnd(in)) { discardInvalidCommand(out); return; }
 
     if (param == "EVEN") {
         out << std::count_if(polygons.cbegin(), polygons.cend(), isEven) << "\n";
@@ -223,10 +220,10 @@ void cmdCount(std::vector<Polygon>& polygons, std::istream& in, std::ostream& ou
     }
     else {
         if (param.empty() || !std::all_of(param.cbegin(), param.cend(), [](unsigned char c) { return std::isdigit(c); })) {
-            discardInvalidCommand(in, out); return;
+            discardInvalidCommand(out); return;
         }
         size_t v = std::stoull(param);
-        if (v < 3) { discardInvalidCommand(in, out); return; }
+        if (v < 3) { discardInvalidCommand(out); return; }
         out << std::count_if(polygons.cbegin(), polygons.cend(), [v](const Polygon& p) {
             return hasNVertexes(p, v); }) << "\n";
     }
@@ -234,8 +231,8 @@ void cmdCount(std::vector<Polygon>& polygons, std::istream& in, std::ostream& ou
 
 void cmdRmEcho(std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
     Polygon target;
-    if (!(in >> target) || !checkLineEnd(in)) { discardInvalidCommand(in, out); return; }
-    if (computeArea(target) == 0.0) { discardInvalidCommand(in, out); return; }
+    if (!(in >> target) || !checkLineEnd(in)) { discardInvalidCommand(out); return; }
+    if (computeArea(target) == 0.0) { discardInvalidCommand(out); return; }
 
     auto newEnd = std::remove_if(polygons.begin(), polygons.end(), [&](const Polygon& p) {
         return p == target;
@@ -246,8 +243,8 @@ void cmdRmEcho(std::vector<Polygon>& polygons, std::istream& in, std::ostream& o
 
 void cmdIntersections(std::vector<Polygon>& polygons, std::istream& in, std::ostream& out) {
     Polygon target;
-    if (!(in >> target) || !checkLineEnd(in)) { discardInvalidCommand(in, out); return; }
-    if (computeArea(target) == 0.0) { discardInvalidCommand(in, out); return; }
+    if (!(in >> target) || !checkLineEnd(in)) { discardInvalidCommand(out); return; }
+    if (computeArea(target) == 0.0) { discardInvalidCommand(out); return; }
 
     out << std::count_if(polygons.cbegin(), polygons.cend(), [&](const Polygon& p) {
         return polygonsIntersect(p, target);
@@ -286,14 +283,18 @@ int main(int argc, char* argv[]) {
         {"COUNT", cmdCount}, {"RMECHO", cmdRmEcho}, {"INTERSECTIONS", cmdIntersections}
     };
 
-    std::string commandName;
-    while (std::cin >> commandName) {
+    while (std::getline(std::cin, line)) {
+        if (line.empty()) continue;
+        std::istringstream iss(line);
+        std::string commandName;
+        if (!(iss >> commandName)) continue;
+
         auto it = commands.find(commandName);
         if (it != commands.end()) {
-            it->second(polygons, std::cin, std::cout);
+            it->second(polygons, iss, std::cout);
         }
         else {
-            discardInvalidCommand(std::cin, std::cout);
+            discardInvalidCommand(std::cout);
         }
     }
     return 0;
