@@ -390,11 +390,11 @@ int main(int argc, char* argv[]) {
 
         }
         catch (const std::out_of_range&) {
-            std::cerr << "<INVALID COMMAND>\n";
+            std::cout << "<INVALID COMMAND>\n";
             polozhuk::dvornik(std::cin);
         }
         catch (const std::invalid_argument& e) {
-            std::cerr << e.what() << "\n";
+            std::cout << e.what() << "\n";
             polozhuk::dvornik(std::cin);
         }
 
