@@ -242,11 +242,11 @@ namespace polozhuk{
         in >> line;
         using namespace std::placeholders;
         if (line == "AREA") {
-            out << std::accumulate(polygons.cbegin(), polygons.cend(), 0.0, accumulateMaxArea);
+            out << std::accumulate(polygons.cbegin(), polygons.cend(), 0.0, accumulateMaxArea) << '\n';
         }
         else if (line == "VERTEXES")
         {
-            out << std::accumulate(polygons.cbegin(), polygons.cend(), 0.0, accumulateMaxVertexes);
+            out << std::accumulate(polygons.cbegin(), polygons.cend(), 0ull, accumulateMaxVertexes) << '\n';
         }
         else
         {
