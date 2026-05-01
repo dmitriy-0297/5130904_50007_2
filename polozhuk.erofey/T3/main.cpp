@@ -334,6 +334,7 @@ namespace polozhuk{
         }
         size_t count = std::count(polygons.cbegin(), polygons.cend(), cmd);
         std::vector<Polygon> new_polygons;
+        new_polygons.reserve(polygons.size() + count);
         std::for_each(polygons.cbegin(), polygons.cend(),
             [&new_polygons, &cmd](const Polygon& p) {
                 new_polygons.push_back(p);
