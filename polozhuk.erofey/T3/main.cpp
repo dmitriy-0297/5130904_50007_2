@@ -332,18 +332,22 @@ namespace polozhuk{
         if (!(in >> cmd) || cmd.points_.size() < 3) {
             throw std::invalid_argument("<INVALID COMMAND>");
         }
+
         size_t count = std::count(polygons.cbegin(), polygons.cend(), cmd);
-        std::vector<Polygon> new_polygons;
-        new_polygons.reserve(polygons.size() + count);
-        std::for_each(polygons.cbegin(), polygons.cend(),
-            [&new_polygons, &cmd](const Polygon& p) {
-                new_polygons.push_back(p);
-                if (p == cmd) {
+        if (count > 0) {
+            std::vector<Polygon> new_polygons;
+            new_polygons.reserve(polygons.size() + count);
+            std::for_each(polygons.cbegin(), polygons.cend(),
+                [&new_polygons, &cmd](const Polygon& p) {
                     new_polygons.push_back(p);
-                }
-                return new_polygons;
-            });
-        polygons = std::move(new_polygons);
+                    if (p == cmd) {
+                        new_polygons.push_back(p);
+                    }
+                    return new_polygons;
+                });
+            polygons = std::move(new_polygons);
+        }
+        out << count << "\n";
     }
 };
 
