@@ -1,4 +1,4 @@
-#include "DataStruct.h"
+#include "PolygonManager.h"
 
 int main(int argc, char* argv[])
 {
@@ -20,30 +20,53 @@ int main(int argc, char* argv[])
 
     while (std::getline(inputFile, line))
     {
-        std::stringstream ss(line);
+        if (line.empty())
+        {
+            continue;
+        }
+
+        // Find the first '(' to separate vertex count from points
+        size_t firstParen = line.find('(');
+        if (firstParen == std::string::npos)
+        {
+            continue;
+        }
+
+        // Extract vertex count
         int vertexCount = 0;
-        if (!(ss >> vertexCount))
+        try
+        {
+            vertexCount = std::stoi(line.substr(0, firstParen));
+        }
+        catch (...)
+        {
+            continue;
+        }
+
+        if (vertexCount <= 0)
         {
             continue;
         }
 
         Polygon polygon;
         bool isValid = true;
+
+        // Parse points - find all (...) patterns
+        size_t pos = firstParen;
         for (int i = 0; i < vertexCount; ++i)
         {
-            std::string pointStr;
-            if (!(ss >> pointStr))
+            size_t start = line.find('(', pos);
+            size_t end = line.find(')', start);
+
+            if (start == std::string::npos || end == std::string::npos)
             {
                 isValid = false;
                 break;
             }
 
-            if (pointStr.front() == '(' && pointStr.back() == ')')
-            {
-                pointStr = pointStr.substr(1, pointStr.length() - 2);
-            }
-
+            std::string pointStr = line.substr(start + 1, end - start - 1);
             size_t separatorPos = pointStr.find(';');
+
             if (separatorPos == std::string::npos)
             {
                 isValid = false;
@@ -55,6 +78,7 @@ int main(int argc, char* argv[])
                 int xVal = std::stoi(pointStr.substr(0, separatorPos));
                 int yVal = std::stoi(pointStr.substr(separatorPos + 1));
                 polygon.points.push_back({xVal, yVal});
+                pos = end + 1;
             }
             catch (...)
             {
