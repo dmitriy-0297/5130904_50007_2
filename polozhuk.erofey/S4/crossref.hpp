@@ -9,10 +9,6 @@
 #include <algorithm>
 #include <cctype>
 #include <iterator>
-#include <map>
-#include <map>
-#include <map>
-#include <map>
 
 namespace polozhuk {
     class CrossReference {
@@ -38,6 +34,29 @@ namespace polozhuk {
         }
 
     public:
+
+        void build_index(const std::string& filepath)
+        {
+            std::ifstream ifs(filepath);
+            std::string line;
+            if (!ifs.is_open()) {
+                std::cerr << "Error opening";
+                throw std::runtime_error("Error opening");
+            }
+            size_t index = 0;
+            while (std::getline(ifs, line)) {
+                ++index;
+                std::istringstream iss(line);
+                using istrit = std::istream_iterator<std::string>;
+                std::for_each(istrit(iss), istrit(),
+                [this, index](const std::string& s) {
+                    std::string cword = clean_word(s);
+                    if (!cword.empty()) {
+                        my_map_[cword].push_back(index);
+                    }
+                });
+            }
+        }
 
     };
 };
