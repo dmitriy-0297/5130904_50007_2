@@ -58,6 +58,20 @@ namespace polozhuk {
             }
         }
 
+        void print_index() const {
+            if (my_map_.empty()) {
+                std::cout << "empty map" << std::endl;
+                return;
+            }
+            std::for_each(my_map_.cbegin(), my_map_.cend(), [](const auto& item) {
+                std::cout << item.first << " -> strings: ";
+                std::copy(item.second.cbegin(),item.second.cend(),
+                          std::ostream_iterator<size_t>(std::cout, ", ")
+                );
+                std::cout << std::endl;
+            });
+        }
+
     };
 };
 #endif
