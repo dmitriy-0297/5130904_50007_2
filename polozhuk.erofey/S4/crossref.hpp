@@ -18,9 +18,12 @@ namespace polozhuk
         void build_index(const std::string& filepath);
         void print_index() const;
         void search_word(const std::string& text);
-        void clear_index()
+        void clear()
         {
             my_map_.clear();
+        }
+        size_t words_count() const {
+            return my_map_.size();
         }
     private:
         using map_ = std::map<std::string, std::vector<size_t>>;
