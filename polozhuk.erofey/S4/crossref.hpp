@@ -12,29 +12,8 @@
 
 namespace polozhuk {
     class CrossReference {
-        using map_ = std::map<std::string, std::vector<size_t>>;
-        using iterator = map_::iterator;
-        using const_iterator = map_::const_iterator;
-    private:
-        map_ my_map_;
-        std::string clean_word(std::string word) {
-            std::string temp = "";
-            std::copy_if(word.cbegin(), word.cend(), std::back_inserter(temp),
-                [](char c) {
-                    if (std::isalpha(c)) {
-                        return true;
-                    }
-                    return false;
-                });
-            std::transform(temp.begin(), temp.end(), temp.begin(),
-                [](char c) {
-                return std::tolower(c);
-            });
-            return temp;
-        }
 
     public:
-
         void build_index(const std::string& filepath)
         {
             std::ifstream ifs(filepath);
@@ -63,7 +42,8 @@ namespace polozhuk {
                 std::cout << "empty map" << std::endl;
                 return;
             }
-            std::for_each(my_map_.cbegin(), my_map_.cend(), [](const auto& item) {
+            std::for_each(my_map_.cbegin(), my_map_.cend(),
+                [](const std::pair<const std::string, std::vector<size_t>> &item) {
                 std::cout << item.first << " -> strings: ";
                 std::copy(item.second.cbegin(),item.second.cend(),
                           std::ostream_iterator<size_t>(std::cout, ", ")
@@ -71,7 +51,41 @@ namespace polozhuk {
                 std::cout << std::endl;
             });
         }
+        void search_word(const std::string& text) {
+            auto my_text = my_map_.find(clean_word(text));
+            if (my_text != my_map_.end()) {
+                std::copy(my_text->second.cbegin(), my_text->second.cend(),
+                    std::ostream_iterator<size_t>(std::cout, ", "));
+                std::cout << std::endl;
+                return;
+            }
+            std::cout << "nothing found"<< std::endl;
+            return;
+        }
 
+        void clear_index() {
+            my_map_.clear();
+        }
+    private:
+        using map_ = std::map<std::string, std::vector<size_t>>;
+        using iterator = map_::iterator;
+        using const_iterator = map_::const_iterator;
+        map_ my_map_;
+        std::string clean_word(std::string word) {
+            std::string temp = "";
+            std::copy_if(word.cbegin(), word.cend(), std::back_inserter(temp),
+                [](char c) {
+                    if (std::isalpha(c)) {
+                        return true;
+                    }
+                    return false;
+                });
+            std::transform(temp.begin(), temp.end(), temp.begin(),
+                [](char c) {
+                return std::tolower(c);
+            });
+            return temp;
+        }
     };
 };
 #endif
