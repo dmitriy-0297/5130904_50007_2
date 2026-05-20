@@ -10,13 +10,16 @@
 #include <cctype>
 #include <iterator>
 
-namespace polozhuk {
-    class CrossReference {
+namespace polozhuk
+{
+    class CrossReference
+    {
     public:
         void build_index(const std::string& filepath);
         void print_index() const;
         void search_word(const std::string& text);
-        void clear_index() {
+        void clear_index()
+        {
             my_map_.clear();
         }
     private:
@@ -27,4 +30,5 @@ namespace polozhuk {
         static std::string clean_word(std::string word);
     };
 };
+
 #endif

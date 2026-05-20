@@ -5,10 +5,7 @@ std::string polozhuk::CrossReference::clean_word(std::string word)
     std::string temp = "";
     std::copy_if(word.cbegin(), word.cend(), std::back_inserter(temp),
         [](char c) {
-            if (std::isalpha(c)) {
-                return true;
-            }
-            return false;
+            return std::isalpha(c);
         });
     std::transform(temp.begin(), temp.end(), temp.begin(),
         [](char c) {
@@ -29,8 +26,6 @@ void polozhuk::CrossReference::search_word(const std::string& text)
     std::cout << "nothing found"<< std::endl;
     return;
 }
-
-
 void polozhuk::CrossReference::print_index() const
 {
     if (my_map_.empty()) {
@@ -47,7 +42,8 @@ void polozhuk::CrossReference::print_index() const
     });
 }
 
-void polozhuk::CrossReference::build_index(const std::string& filepath) {
+void polozhuk::CrossReference::build_index(const std::string& filepath)
+{
     std::ifstream ifs(filepath);
     std::string line;
     if (!ifs.is_open()) {
