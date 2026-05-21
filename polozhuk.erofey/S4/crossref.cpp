@@ -1,5 +1,7 @@
 #include "crossref.hpp"
 
+#include <numeric>
+
 std::string polozhuk::CrossReference::clean_word(std::string word)
 {
     std::string temp = "";
@@ -13,7 +15,6 @@ std::string polozhuk::CrossReference::clean_word(std::string word)
     });
     return temp;
 }
-
 void polozhuk::CrossReference::search_word(const std::string& text)
 {
     auto my_text = my_map_.find(clean_word(text));
@@ -74,4 +75,16 @@ void polozhuk::CrossReference::delete_word(const std::string& text) {
         std::cout << "nothing found"<< std::endl;
     }
     return;
+}
+
+size_t polozhuk::CrossReference::count(const std::string& text) const{
+    if (my_map_.empty()) {
+        std::cout << "empty map\n";
+        return 0;
+    }
+    auto my_text = my_map_.find(clean_word(text));
+    if (my_text != my_map_.end()) {
+        return my_text->second.size();
+    }
+    return 0;
 }

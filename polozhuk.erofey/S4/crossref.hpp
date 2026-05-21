@@ -19,7 +19,7 @@ namespace polozhuk
         void print_index() const;
         void search_word(const std::string& text);
         void delete_word(const std::string& text);
-        size_t count(const std::string& text);
+        size_t count(const std::string& text) const;
         void clear()
         {
             my_map_.clear();

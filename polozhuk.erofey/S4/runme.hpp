@@ -18,6 +18,7 @@ namespace polozhuk
         SEARCH,
         PRINT,
         DELETE,
+        COUNT,
         WORDS,
         CLEAR,
         UNKNOWN
@@ -30,13 +31,14 @@ namespace polozhuk
             {"load", Doing::LOAD},
             {"search", Doing::SEARCH},
             {"print", Doing::PRINT},
+            {"count", Doing::COUNT},
+            {"delete", Doing::DELETE},
             {"words", Doing::WORDS},
             {"clear", Doing::CLEAR},
         };
 
         std::cout << "So we can do: load <filename>, search <word>, print, words, clear" << std::endl;
         std::cout << "Press Ctrl+D to exit." << std::endl;
-
         while (true) {
             std::cout << " > ";
             std::string line;
@@ -46,11 +48,11 @@ namespace polozhuk
                 break;
             }
 
-            if (line.empty()) continue;
-            
             std::istringstream iss(line);
             std::string cmd_stream;
-            iss >> cmd_stream;
+            if (!(iss >> cmd_stream)) {
+                continue;
+            }
 
             Doing doing = Doing::UNKNOWN;
             auto it = doing_map.find(cmd_stream);
@@ -84,6 +86,16 @@ namespace polozhuk
                     }
                     break;
                 }
+                case Doing::COUNT: {
+                    std::string doing_line;
+                    if (iss >> doing_line) {
+                        std::cout << "Word '" << doing_line << "' found "
+                  << my_crossref.count(doing_line) << " times.\n";
+                    } else {
+                        std::cout << "wrong word\n";
+                    }
+                    break;
+                }
                 case Doing::PRINT: {
                     my_crossref.print_index();
                     break;
@@ -100,6 +112,7 @@ namespace polozhuk
                 case Doing::UNKNOWN:
                 default:
                     std::cout << "Unknown command.\n";
+                    std::cin.clear();
                     break;
             }
         }
