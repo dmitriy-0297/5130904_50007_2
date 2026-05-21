@@ -11,8 +11,7 @@
 #include <iterator>
 #include "crossref.hpp"
 
-namespace polozhuk
-{
+namespace polozhuk {
     enum class Doing {
         LOAD,
         SEARCH,
@@ -26,7 +25,7 @@ namespace polozhuk
 
     void run_me() {
         CrossReference my_crossref;
-        
+
         const std::map<std::string, Doing> doing_map = {
             {"load", Doing::LOAD},
             {"search", Doing::SEARCH},
@@ -42,7 +41,7 @@ namespace polozhuk
         while (true) {
             std::cout << " > ";
             std::string line;
-            
+
             if (!std::getline(std::cin, line)) {
                 std::cout << "EOF received. Exiting...\n";
                 break;
@@ -89,8 +88,8 @@ namespace polozhuk
                 case Doing::COUNT: {
                     std::string doing_line;
                     if (iss >> doing_line) {
-                        std::cout << "Word '" << doing_line << "' found "
-                  << my_crossref.count(doing_line) << " times.\n";
+                        std::cout << "Word " << doing_line << " found "
+                                << my_crossref.count(doing_line) << " times.\n";
                     } else {
                         std::cout << "wrong word\n";
                     }
@@ -121,3 +120,4 @@ namespace polozhuk
 
 
 #endif // INC_5130904_50007_2_RUNME_HPP
+
