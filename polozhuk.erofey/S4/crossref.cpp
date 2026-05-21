@@ -37,7 +37,7 @@ void polozhuk::CrossReference::print_index() const
         [](const std::pair<const std::string, std::vector<size_t>> &item) {
         std::cout << item.first << " -> strings: ";
         std::copy(item.second.cbegin(),item.second.cend(),
-                  std::ostream_iterator<size_t>(std::cout, ", ")
+                  std::ostream_iterator<size_t>(std::cout, " ")
         );
         std::cout << std::endl;
     });
