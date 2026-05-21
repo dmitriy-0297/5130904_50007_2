@@ -34,7 +34,7 @@ namespace polozhuk
         };
 
         std::cout << "So we can do: load <filename>, search <word>, print, words, clear" << std::endl;
-        std::cout << "Press Ctrl+D (Linux) or Ctrl+Z then Enter (Windows) to exit." << std::endl;
+        std::cout << "Press Ctrl+D to exit." << std::endl;
 
         while (true) {
             std::cout << " > ";
@@ -81,7 +81,8 @@ namespace polozhuk
                     break;
                 }
                 case Doing::WORDS: {
-                    my_crossref.words_count();
+                    std::cout << "Unique words count: " << my_crossref.words_count() << "\n";
+                    break;
                     break;
                 }
                 case Doing::CLEAR: {

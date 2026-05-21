@@ -13,7 +13,7 @@ int main() {
         return 1;
     }
     catch (...) {
-        std::cerr << "Error" << std::endl;
+        std::cerr << "The program is terminating forcefully." << std::endl;
         return 1;
     }
 
