@@ -8,10 +8,6 @@ int main() {
     try {
         polozhuk::run_me();
     }
-    catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-        return 1;
-    }
     catch (...) {
         std::cerr << "The program is terminating forcefully." << std::endl;
         return 1;

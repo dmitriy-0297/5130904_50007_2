@@ -64,3 +64,14 @@ void polozhuk::CrossReference::build_index(const std::string& filepath)
         });
     }
 }
+
+void polozhuk::CrossReference::delete_word(const std::string& text) {
+    auto my_text = my_map_.find(clean_word(text));
+    if (my_text != my_map_.end()) {
+        my_map_.erase(my_text);
+    }
+    else {
+        std::cout << "nothing found"<< std::endl;
+    }
+    return;
+}

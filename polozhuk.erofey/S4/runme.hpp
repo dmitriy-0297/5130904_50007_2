@@ -17,6 +17,7 @@ namespace polozhuk
         LOAD,
         SEARCH,
         PRINT,
+        DELETE,
         WORDS,
         CLEAR,
         UNKNOWN
@@ -73,6 +74,13 @@ namespace polozhuk
                         my_crossref.search_word(doing_line);
                     } else {
                         std::cout << "wrong word\n";
+                    }
+                    break;
+                }
+                case Doing::DELETE: {
+                    std::string doing_line;
+                    if (iss >> doing_line) {
+                        my_crossref.delete_word(doing_line);
                     }
                     break;
                 }
