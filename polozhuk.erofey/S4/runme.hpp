@@ -1,3 +1,14 @@
+#ifndef INC_5130904_50007_2_RUNME_HPP
+#define INC_5130904_50007_2_RUNME_HPP
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <map>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
 #include "crossref.hpp"
 
 namespace polozhuk
@@ -10,8 +21,10 @@ namespace polozhuk
         CLEAR,
         UNKNOWN
     };
+
     void run_me() {
         CrossReference my_crossref;
+        
         const std::map<std::string, Doing> doing_map = {
             {"load", Doing::LOAD},
             {"search", Doing::SEARCH},
@@ -19,19 +32,21 @@ namespace polozhuk
             {"words", Doing::WORDS},
             {"clear", Doing::CLEAR},
         };
-        std::cout << "So we can do: load , search , "
-                     "print, words, clear" << std::endl;
-        std::cout << "press Ctrl+D (Linux) or Ctrl+Z then Enter (Windows) to exit."
-              << std::endl;
+
+        std::cout << "So we can do: load <filename>, search <word>, print, words, clear" << std::endl;
+        std::cout << "Press Ctrl+D (Linux) or Ctrl+Z then Enter (Windows) to exit." << std::endl;
+
         while (true) {
             std::cout << " > ";
             std::string line;
+            
             if (!std::getline(std::cin, line)) {
                 std::cout << "EOF received. Exiting...\n";
                 break;
             }
 
             if (line.empty()) continue;
+            
             std::istringstream iss(line);
             std::string cmd_stream;
             iss >> cmd_stream;
@@ -56,8 +71,7 @@ namespace polozhuk
                     std::string doing_line;
                     if (iss >> doing_line) {
                         my_crossref.search_word(doing_line);
-                    }
-                    else {
+                    } else {
                         std::cout << "wrong word\n";
                     }
                     break;
@@ -73,7 +87,6 @@ namespace polozhuk
                 case Doing::CLEAR: {
                     my_crossref.clear();
                     break;
-
                 }
                 case Doing::UNKNOWN:
                 default:
@@ -82,5 +95,6 @@ namespace polozhuk
             }
         }
     }
-};
+}
 
+#endif // INC_5130904_50007_2_RUNME_HPP
