@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <cmath>
 #include <iterator>
+#include <sstream>
 
 struct Point
 {
@@ -118,6 +119,12 @@ void executeArea(std::istream& in, const PolygonContainer& polygons)
     std::cout << "<INVALID COMMAND>\n";
     return;
   }
+  std::string trailing;
+  if (in >> trailing)
+  {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
   double totalArea = 0.0;
   if (argument == "ODD")
   {
@@ -182,6 +189,12 @@ void executeMax(std::istream& in, const PolygonContainer& polygons)
     std::cout << "<INVALID COMMAND>\n";
     return;
   }
+  std::string trailing;
+  if (in >> trailing)
+  {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
   if (argument == "AREA")
   {
     auto maxIt = std::max_element(polygons.begin(), polygons.end(),
@@ -214,6 +227,12 @@ void executeMin(std::istream& in, const PolygonContainer& polygons)
     std::cout << "<INVALID COMMAND>\n";
     return;
   }
+  std::string trailing;
+  if (in >> trailing)
+  {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
   if (argument == "AREA")
   {
     auto minIt = std::min_element(polygons.begin(), polygons.end(),
@@ -242,6 +261,12 @@ void executeCount(std::istream& in, const PolygonContainer& polygons)
 {
   std::string argument;
   if (!(in >> argument))
+  {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
+  std::string trailing;
+  if (in >> trailing)
   {
     std::cout << "<INVALID COMMAND>\n";
     return;
@@ -294,9 +319,12 @@ void executeLessArea(std::istream& in, const PolygonContainer& polygons)
   if (!(in >> targetPolygon))
   {
     std::cout << "<INVALID COMMAND>\n";
-    in.clear();
-    std::string skip;
-    in >> skip;
+    return;
+  }
+  std::string trailing;
+  if (in >> trailing)
+  {
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
   double targetArea = calculatePolygonArea(targetPolygon);
@@ -314,9 +342,12 @@ void executeMaxSeq(std::istream& in, const PolygonContainer& polygons)
   if (!(in >> targetPolygon))
   {
     std::cout << "<INVALID COMMAND>\n";
-    in.clear();
-    std::string skip;
-    in >> skip;
+    return;
+  }
+  std::string trailing;
+  if (in >> trailing)
+  {
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
   struct State
@@ -352,39 +383,47 @@ public:
 
   void processCommands(std::istream& in) const
   {
-    std::string mainCommand;
-    while (in >> mainCommand)
+    std::string line;
+    while (std::getline(in, line))
     {
+      if (line.empty())
+      {
+        continue;
+      }
+      std::stringstream ss(line);
+      std::string mainCommand;
+      if (!(ss >> mainCommand))
+      {
+        continue;
+      }
+
       if (mainCommand == "AREA")
       {
-        executeArea(in, polygons_);
+        executeArea(ss, polygons_);
       }
       else if (mainCommand == "MAX")
       {
-        executeMax(in, polygons_);
+        executeMax(ss, polygons_);
       }
       else if (mainCommand == "MIN")
       {
-        executeMin(in, polygons_);
+        executeMin(ss, polygons_);
       }
       else if (mainCommand == "COUNT")
       {
-        executeCount(in, polygons_);
+        executeCount(ss, polygons_);
       }
       else if (mainCommand == "LESSAREA")
       {
-        executeLessArea(in, polygons_);
+        executeLessArea(ss, polygons_);
       }
       else if (mainCommand == "MAXSEQ")
       {
-        executeMaxSeq(in, polygons_);
+        executeMaxSeq(ss, polygons_);
       }
       else
       {
         std::cout << "<INVALID COMMAND>\n";
-        in.clear();
-        std::string skip;
-        std::getline(in, skip);
       }
     }
   }
@@ -418,7 +457,7 @@ int main(int argc, char* argv[])
     {
       inputFile.clear();
       std::string skip;
-      inputFile >> skip;
+      std::getline(inputFile, skip);
     }
   }
   inputFile.close();
