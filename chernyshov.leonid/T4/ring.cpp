@@ -13,16 +13,20 @@ Ring::Ring(const Point& center, double outerRadius, double innerRadius)
     if (outerRadius_ <= 0.0) {
         throw std::invalid_argument("Ring outer radius must be positive");
     }
+
     if (innerRadius_ <= 0.0) {
         throw std::invalid_argument("Ring inner radius must be positive");
     }
+
     if (innerRadius_ >= outerRadius_) {
-        throw std::invalid_argument("Ring inner radius must be less than outer");
+        throw std::invalid_argument(
+            "Ring inner radius must be less than outer");
     }
 }
 
 double Ring::getArea() const {
-    return PI * (outerRadius_ * outerRadius_ - innerRadius_ * innerRadius_);
+    return PI * (outerRadius_ * outerRadius_
+                 - innerRadius_ * innerRadius_);
 }
 
 Point Ring::getCenter() const {
@@ -38,6 +42,7 @@ void Ring::scale(double factor) {
     if (factor <= 0.0) {
         throw std::invalid_argument("Scale factor must be positive");
     }
+
     outerRadius_ *= factor;
     innerRadius_ *= factor;
 }

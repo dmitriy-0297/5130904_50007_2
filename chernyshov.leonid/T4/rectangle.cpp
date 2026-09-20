@@ -29,12 +29,14 @@ void Rectangle::scale(double factor) {
     if (factor <= 0.0) {
         throw std::invalid_argument("Scale factor must be positive");
     }
+
     Point center = getCenter();
+
     double halfW = (topRight_.x - bottomLeft_.x) / 2.0 * factor;
     double halfH = (topRight_.y - bottomLeft_.y) / 2.0 * factor;
 
     bottomLeft_ = Point{center.x - halfW, center.y - halfH};
-    topRight_   = Point{center.x + halfW, center.y + halfH};
+    topRight_ = Point{center.x + halfW, center.y + halfH};
 }
 
 std::string Rectangle::getName() const {

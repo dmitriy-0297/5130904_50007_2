@@ -12,11 +12,14 @@ CompositeShape::CompositeShape(const CompositeShape& other) {
 CompositeShape& CompositeShape::operator=(const CompositeShape& other) {
     if (this != &other) {
         std::vector<std::unique_ptr<Shape>> temp;
+
         for (const auto& s : other.shapes_) {
             temp.push_back(s->clone());
         }
+
         shapes_ = std::move(temp);
     }
+
     return *this;
 }
 
@@ -24,14 +27,17 @@ void CompositeShape::add(std::unique_ptr<Shape> shape) {
     if (!shape) {
         throw std::invalid_argument("Cannot add null shape");
     }
+
     shapes_.push_back(std::move(shape));
 }
 
 double CompositeShape::getArea() const {
     double total = 0.0;
+
     for (const auto& s : shapes_) {
         total += s->getArea();
     }
+
     return total;
 }
 
@@ -47,13 +53,15 @@ Point CompositeShape::getCenter() const {
 
     for (const auto& s : shapes_) {
         Point c = s->getCenter();
+
         minX = std::min(minX, c.x);
         maxX = std::max(maxX, c.x);
         minY = std::min(minY, c.y);
         maxY = std::max(maxY, c.y);
     }
 
-    return Point{(minX + maxX) / 2.0, (minY + maxY) / 2.0};
+    return Point{(minX + maxX) / 2.0,
+                 (minY + maxY) / 2.0};
 }
 
 void CompositeShape::move(double dx, double dy) {
@@ -66,6 +74,7 @@ void CompositeShape::scale(double factor) {
     if (factor <= 0.0) {
         throw std::invalid_argument("Scale factor must be positive");
     }
+
     if (shapes_.empty()) {
         return;
     }
@@ -74,8 +83,10 @@ void CompositeShape::scale(double factor) {
 
     for (auto& s : shapes_) {
         Point c = s->getCenter();
+
         double dx = (c.x - baseCenter.x) * (factor - 1.0);
         double dy = (c.y - baseCenter.y) * (factor - 1.0);
+
         s->move(dx, dy);
         s->scale(factor);
     }

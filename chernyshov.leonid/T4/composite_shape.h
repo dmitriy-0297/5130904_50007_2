@@ -24,7 +24,9 @@ public:
     std::string getName() const override;
     std::unique_ptr<Shape> clone() const override;
 
-    const std::vector<std::unique_ptr<Shape>>& getShapes() const { return shapes_; }
+    const std::vector<std::unique_ptr<Shape>>& getShapes() const {
+        return shapes_;
+    }
 
 private:
     std::vector<std::unique_ptr<Shape>> shapes_;
