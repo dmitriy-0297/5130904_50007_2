@@ -1,9 +1,9 @@
-#include "DataStruct.h"
-
-#include <algorithm>
 #include <iostream>
-#include <iterator>
 #include <vector>
+#include <iterator>
+#include <algorithm>
+
+#include "DataStruct.h"
 
 int main()
 {
@@ -16,14 +16,14 @@ int main()
     );
 
     std::sort(
-        data.begin(),
-        data.end(),
+        std::begin(data),
+        std::end(data),
         compareDataStruct
     );
 
     std::copy(
-        data.begin(),
-        data.end(),
+        std::begin(data),
+        std::end(data),
         std::ostream_iterator<DataStruct>(std::cout, "\n")
     );
 
